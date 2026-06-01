@@ -81,7 +81,7 @@ const sendRegistrationNotification = async (user) => {
 
 const sendApprovalNotification = async (user) => {
   const role = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-  const BASE = process.env.BASE_URL || 'http://localhost:3000';
+  const BASE = process.env.BASE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'http://localhost:3000');
   const dashboardLink = user.role === 'coach'
     ? BASE + '/coach/dashboard'
     : BASE + '/member/dashboard';
