@@ -8,7 +8,8 @@ const connectDB = require('./config/db');
 
 const app = express();
 
-connectDB();
+const dbPromise = connectDB().catch(err => console.error('DB init error:', err.message));
+app.use(async (req, res, next) => { await dbPromise; next(); });
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'frontend', 'views'));

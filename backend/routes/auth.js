@@ -2,16 +2,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const multer = require('multer');
-const path = require('path');
 const { sendRegistrationNotification, sendLoginVerification } = require('../config/notifications');
 
-const storage = multer.diskStorage({
-  destination: 'public/uploads',
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/login', (req, res) => {
   res.render('login', { messages: req.flash() });
@@ -43,7 +36,7 @@ router.post('/register', upload.array('certificates', 5), async (req, res) => {
       const certificates = [];
       if (req.files) {
         req.files.forEach(file => {
-          certificates.push({ name: file.originalname, file: '/uploads/' + file.filename });
+          certificates.push({ name: file.originalname, file: '' });
         });
       }
       userData.coachDetails = {
@@ -52,7 +45,7 @@ router.post('/register', upload.array('certificates', 5), async (req, res) => {
         specialties: specialties ? (Array.isArray(specialties) ? specialties : [specialties]) : [],
         bio,
         ratePerMonth: Number(ratePerMonth) || 0,
-        profileImage: req.files && req.files[0] ? '/uploads/' + req.files[0].filename : ''
+        profileImage: ''
       };
     }
 
