@@ -11,14 +11,17 @@
         <p class="text-muted mb-0">Manage member registrations</p>
       </div>
     </div>
-    <a href="/admin/dashboard" class="btn btn-outline-secondary rounded-3">Back</a>
+    <div>
+      <a href="/admin/users/add?role=member" class="btn btn-success rounded-3"><i class="bi bi-plus-lg"></i> Add Member</a>
+      <a href="/admin/dashboard" class="btn btn-outline-secondary rounded-3">Back</a>
+    </div>
   </div>
   <div class="card shadow border-0 rounded-4">
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead>
-            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Goals</th><th>Status</th><th>Action</th></tr>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Age</th><th>Goals</th><th>Status</th><th>Actions</th></tr>
           </thead>
           <tbody>
             <% members.forEach(m => { %>
@@ -29,21 +32,21 @@
                 <td><%= m.memberDetails?.age || '-' %></td>
                 <td><%= (m.memberDetails?.fitnessGoals || '').substring(0, 30) || '-' %></td>
                 <td>
-                  <span class="badge bg-<%= m.status === 'approved' ? 'success' : m.status === 'pending' ? 'warning' : 'danger' %>">
-                    <%= m.status %>
-                  </span>
+                  <form action="/admin/users/status/<%= m._id %>" method="POST" class="d-inline">
+                    <select name="status" class="form-select form-select-sm d-inline w-auto rounded-3" onchange="this.form.submit()" style="background:<%= m.status === 'approved' ? '#d1fae5' : m.status === 'pending' ? '#fef3c7' : '#fee2e2' %>;border:none;font-weight:500;">
+                      <option value="approved" <%= m.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                      <option value="pending" <%= m.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                      <option value="rejected" <%= m.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                    </select>
+                  </form>
                 </td>
                 <td>
-                  <% if (m.status === 'pending') { %>
-                    <form action="/admin/approve/<%= m._id %>" method="POST" class="d-inline">
-                      <button class="btn btn-sm btn-success rounded-3"><i class="bi bi-check-lg"></i></button>
+                  <div class="d-flex gap-1">
+                    <a href="/admin/users/edit/<%= m._id %>" class="btn btn-sm btn-outline-primary rounded-3"><i class="bi bi-pencil"></i></a>
+                    <form action="/admin/users/delete/<%= m._id %>" method="POST" class="d-inline" onsubmit="return confirm('Delete <%= m.name %>?')">
+                      <button class="btn btn-sm btn-outline-danger rounded-3"><i class="bi bi-trash"></i></button>
                     </form>
-                    <form action="/admin/reject/<%= m._id %>" method="POST" class="d-inline">
-                      <button class="btn btn-sm btn-danger rounded-3"><i class="bi bi-x-lg"></i></button>
-                    </form>
-                  <% } else { %>
-                    <span class="text-muted small">-</span>
-                  <% } %>
+                  </div>
                 </td>
               </tr>
             <% }) %>

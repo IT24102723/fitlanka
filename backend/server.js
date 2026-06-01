@@ -1,6 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
 const flash = require('connect-flash');
 const path = require('path');
 const connectDB = require('./config/db');
@@ -19,7 +20,13 @@ app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 14 * 24 * 60 * 60
+  }),
+  cookie: { maxAge: 14 * 24 * 60 * 60 * 1000 }
 }));
 
 app.use(flash());
@@ -42,7 +49,11 @@ app.use('/coach', require('./routes/coach'));
 app.use('/member', require('./routes/member'));
 app.use('/payment', require('./routes/payment'));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
