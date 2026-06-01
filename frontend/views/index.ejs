@@ -1,0 +1,266 @@
+<%- include('partials/header') %>
+
+<!-- ===== HERO ===== -->
+<section class="hero-section d-flex align-items-center position-relative overflow-hidden">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="container position-relative z-3 text-center text-white">
+    <p class="text-uppercase fw-bold text-warning tracking-wide mb-3 animate-fade">#1 Fitness Platform in Sri Lanka</p>
+    <h1 class="display-3 fw-bold hero-title mb-3">
+      Transform Your Body<br>
+      <span class="text-warning">Transform Your Life</span>
+    </h1>
+    <p class="lead mb-4 mx-auto" style="max-width: 600px;">
+      Sri Lanka's trusted platform connecting certified coaches with fitness seekers.
+      Train smarter with expert guidance tailored just for you.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <% if (!user) { %>
+        <a href="/register" class="btn btn-warning btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg">
+          Get Started Free <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+        <a href="/login" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">Login</a>
+      <% } else if (user.role === 'member') { %>
+        <a href="/member/coaches" class="btn btn-warning btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg">Find Your Coach</a>
+      <% } else if (user.role === 'coach') { %>
+        <a href="/coach/dashboard" class="btn btn-warning btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg">My Dashboard</a>
+      <% } else { %>
+        <a href="/admin/dashboard" class="btn btn-warning btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg">Admin Panel</a>
+      <% } %>
+    </div>
+    <div class="row mt-5 pt-4 g-3 justify-content-center">
+      <div class="col-4 col-md-2">
+        <div class="bg-white bg-opacity-10 rounded-3 p-3 backdrop-blur">
+          <div class="fs-2 fw-bold text-warning"><%= stats.coaches %></div>
+          <small class="text-white-50">Certified Coaches</small>
+        </div>
+      </div>
+      <div class="col-4 col-md-2">
+        <div class="bg-white bg-opacity-10 rounded-3 p-3 backdrop-blur">
+          <div class="fs-2 fw-bold text-warning"><%= stats.members %></div>
+          <small class="text-white-50">Active Members</small>
+        </div>
+      </div>
+      <div class="col-4 col-md-2">
+        <div class="bg-white bg-opacity-10 rounded-3 p-3 backdrop-blur">
+          <div class="fs-2 fw-bold text-warning">5</div>
+          <small class="text-white-50">Cities Covered</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="py-5 position-relative">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-warning text-dark px-3 py-2 mb-2">HOW IT WORKS</span>
+      <h2 class="fw-bold display-6">Your Fitness Journey in <span class="text-warning">3 Simple Steps</span></h2>
+      <p class="text-muted">Get started with FitLanka and achieve your fitness goals</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center step-card">
+          <div class="step-number mx-auto">1</div>
+          <div class="card-body">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=200&h=200&fit=crop&crop=face" alt="Register" class="rounded-circle mb-3 shadow" style="width:100px;height:100px;object-fit:cover;">
+            <h5 class="fw-bold">Register & Get Verified</h5>
+            <p class="text-muted">Sign up as a coach or member. Coaches submit certificates for admin approval.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center step-card">
+          <div class="step-number mx-auto">2</div>
+          <div class="card-body">
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop&crop=face" alt="Find Coach" class="rounded-circle mb-3 shadow" style="width:100px;height:100px;object-fit:cover;">
+            <h5 class="fw-bold">Find Your Perfect Coach</h5>
+            <p class="text-muted">Browse certified coaches, check their specialties, and pick the right one for you.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center step-card">
+          <div class="step-number mx-auto">3</div>
+          <div class="card-body">
+            <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=200&h=200&fit=crop&crop=face" alt="Achieve" class="rounded-circle mb-3 shadow" style="width:100px;height:100px;object-fit:cover;">
+            <h5 class="fw-bold">Train & Achieve</h5>
+            <p class="text-muted">Pay securely via PayHere, get coach contact details, and start your transformation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY CHOOSE US ===== -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge bg-warning text-dark px-3 py-2 mb-2">WHY FITLANKA</span>
+        <h2 class="fw-bold display-6 mb-3">Built for Sri Lanka's <span class="text-warning">Fitness Community</span></h2>
+        <p class="text-muted mb-4">We make fitness accessible, affordable, and trustworthy for everyone in Sri Lanka.</p>
+        <div class="d-flex mb-3">
+          <div class="me-3"><i class="bi bi-patch-check-fill text-warning fs-3"></i></div>
+          <div>
+            <h6 class="fw-bold">Certified & Verified Coaches</h6>
+            <small class="text-muted">Every coach is verified with proper certifications by our admin team.</small>
+          </div>
+        </div>
+        <div class="d-flex mb-3">
+          <div class="me-3"><i class="bi bi-shield-lock-fill text-warning fs-3"></i></div>
+          <div>
+            <h6 class="fw-bold">Safe & Secure Payments</h6>
+            <small class="text-muted">Pay in LKR via PayHere. Transparent pricing with no hidden charges.</small>
+          </div>
+        </div>
+        <div class="d-flex mb-3">
+          <div class="me-3"><i class="bi bi-geo-alt-fill text-warning fs-3"></i></div>
+          <div>
+            <h6 class="fw-bold">Local & Accessible</h6>
+            <small class="text-muted">From Colombo to Kandy, find coaches near you across Sri Lanka.</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="position-relative">
+          <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop" alt="Fitness" class="img-fluid rounded-4 shadow-lg">
+          <div class="position-absolute bottom-0 end-0 bg-warning text-dark p-3 rounded-3 shadow-lg mb-3 me-3">
+            <i class="bi bi-star-fill me-1"></i> Trusted by <%= stats.members %> Members
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED COACHES PREVIEW ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-warning text-dark px-3 py-2 mb-2">OUR COACHES</span>
+      <h2 class="fw-bold display-6">Meet Some of Our <span class="text-warning">Top Coaches</span></h2>
+      <p class="text-muted">Certified professionals ready to guide you</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&h=300&fit=crop" alt="Coach" class="card-img-top" style="height:200px;object-fit:cover;">
+          <div class="card-body text-center p-4">
+            <h5 class="fw-bold">Strength Training Expert</h5>
+            <p class="text-muted small">Specialized in weight training, bodybuilding & powerlifting</p>
+            <a href="/register" class="btn btn-outline-warning rounded-pill px-4">Join to Connect</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1594381898411-846e7d193883?w=400&h=300&fit=crop" alt="Coach" class="card-img-top" style="height:200px;object-fit:cover;">
+          <div class="card-body text-center p-4">
+            <h5 class="fw-bold">Yoga & Flexibility Coach</h5>
+            <p class="text-muted small">Hatha, Vinyasa & meditation for mind-body wellness</p>
+            <a href="/register" class="btn btn-outline-warning rounded-pill px-4">Join to Connect</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&h=300&fit=crop" alt="Coach" class="card-img-top" style="height:200px;object-fit:cover;">
+          <div class="card-body text-center p-4">
+            <h5 class="fw-bold">Cardio & HIIT Specialist</h5>
+            <p class="text-muted small">High-intensity interval training & fat loss programs</p>
+            <a href="/register" class="btn btn-outline-warning rounded-pill px-4">Join to Connect</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GALLERY ===== -->
+<section class="py-5 bg-dark">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-warning text-dark px-3 py-2 mb-2">GALLERY</span>
+      <h2 class="fw-bold display-6 text-white">Our <span class="text-warning">Fitness Community</span></h2>
+    </div>
+    <div class="row g-3">
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+      <div class="col-4">
+        <img src="https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=400&h=300&fit=crop" class="img-fluid rounded-3" style="height:200px;width:100%;object-fit:cover;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="badge bg-warning text-dark px-3 py-2 mb-2">TESTIMONIALS</span>
+      <h2 class="fw-bold display-6">What Our <span class="text-warning">Members Say</span></h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+          <p class="text-muted mb-3">"I found an amazing coach through FitLanka. Lost 10kg in 2 months! The platform is so easy to use."</p>
+          <div class="d-flex align-items-center">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+            <div><strong>Kasun D.</strong><br><small class="text-muted">Colombo</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+          <p class="text-muted mb-3">"As a busy professional, I needed a flexible coach. FitLanka connected me with someone who understands my schedule."</p>
+          <div class="d-flex align-items-center">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+            <div><strong>Saman P.</strong><br><small class="text-muted">Kandy</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+          <p class="text-muted mb-3">"The coaches are highly qualified and the whole process from registration to payment was smooth. Highly recommend!"</p>
+          <div class="d-flex align-items-center">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
+            <div><strong>Nadeeka M.</strong><br><small class="text-muted">Galle</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="py-5 bg-dark text-white text-center position-relative overflow-hidden">
+  <div class="cta-glow"></div>
+  <div class="container position-relative z-3">
+    <h2 class="fw-bold display-6 mb-3">Ready to Start Your Fitness Journey?</h2>
+    <p class="lead mb-4">Join hundreds of Sri Lankans who transformed their lives with FitLanka.</p>
+    <% if (!user) { %>
+      <a href="/register" class="btn btn-warning btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg">Register Now — It's Free</a>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

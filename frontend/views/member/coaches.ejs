@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex align-items-center mb-4">
+    <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+      <i class="bi bi-person-badge fs-2 text-warning"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0">Available Coaches</h2>
+      <p class="text-muted mb-0">Find the perfect coach for your fitness goals</p>
+    </div>
+  </div>
+  <div class="row g-4">
+    <% coaches.forEach((c, index) => { %>
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100 overflow-hidden">
+          <div style="height:180px;overflow:hidden;background:linear-gradient(135deg,#0f0c29,#302b63);">
+            <img src="https://images.unsplash.com/photos?w=400&h=200&fit=crop&random=<%= index %>" alt="Coach" style="width:100%;height:100%;object-fit:cover;opacity:0.6;">
+          </div>
+          <div class="card-body text-center p-4" style="margin-top:-50px;">
+            <div class="bg-light d-inline-flex p-2 rounded-circle mx-auto mb-2 shadow" style="border:4px solid #fff;">
+              <i class="bi bi-person-circle fs-1 text-secondary"></i>
+            </div>
+            <h4 class="fw-bold"><%= c.name %></h4>
+            <span class="badge bg-warning text-dark mb-3">Rs.<%= c.coachDetails?.ratePerMonth || 2000 %> / month</span>
+            <hr>
+            <div class="text-start small">
+              <p class="mb-1"><i class="bi bi-clock-history text-warning me-1"></i> <strong>Experience:</strong> <%= c.coachDetails?.experience || '-' %> years</p>
+              <p class="mb-1"><i class="bi bi-star text-warning me-1"></i> <strong>Specialties:</strong> <%= (c.coachDetails?.specialties || []).join(', ') || 'General' %></p>
+              <p class="text-muted mt-2 mb-0"><%= (c.coachDetails?.bio || '').substring(0, 100) %></p>
+            </div>
+            <a href="/member/select-coach/<%= c._id %>" class="btn btn-warning w-100 fw-bold mt-3 rounded-3">
+              <i class="bi bi-hand-index-thumb"></i> Select This Coach
+            </a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+    <% if (coaches.length === 0) { %>
+      <div class="col-12 text-center py-5">
+        <div class="display-2 mb-3 text-muted"><i class="bi bi-emoji-frown"></i></div>
+        <h3 class="fw-bold">No Coaches Available Yet</h3>
+        <p class="text-muted">Check back later or contact admin.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

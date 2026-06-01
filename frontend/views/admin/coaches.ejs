@@ -1,0 +1,95 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center">
+      <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+        <i class="bi bi-people fs-2 text-warning"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-0">All Coaches</h4>
+        <p class="text-muted mb-0">Manage coach registrations</p>
+      </div>
+    </div>
+    <a href="/admin/dashboard" class="btn btn-outline-secondary rounded-3">Back</a>
+  </div>
+  <div class="card shadow border-0 rounded-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Name</th><th>Email</th><th>Phone</th><th>Experience</th><th>Rate</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% coaches.forEach(c => { %>
+              <tr>
+                <td class="fw-medium"><%= c.name %></td>
+                <td><%= c.email %></td>
+                <td><%= c.phone %></td>
+                <td><%= c.coachDetails?.experience || '-' %> yrs</td>
+                <td>Rs.<%= c.coachDetails?.ratePerMonth || '-' %></td>
+                <td>
+                  <span class="badge bg-<%= c.status === 'approved' ? 'success' : c.status === 'pending' ? 'warning' : 'danger' %>">
+                    <%= c.status %>
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-info rounded-3" data-bs-toggle="modal" data-bs-target="#coachModal<%= c._id %>"><i class="bi bi-eye"></i></button>
+                  <% if (c.status === 'pending') { %>
+                    <form action="/admin/approve/<%= c._id %>" method="POST" class="d-inline">
+                      <button class="btn btn-sm btn-success rounded-3"><i class="bi bi-check-lg"></i></button>
+                    </form>
+                    <form action="/admin/reject/<%= c._id %>" method="POST" class="d-inline">
+                      <button class="btn btn-sm btn-danger rounded-3"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+
+              <div class="modal fade" id="coachModal<%= c._id %>">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content rounded-4">
+                    <div class="modal-header border-0">
+                      <h5 class="fw-bold"><%= c.name %></h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <p><strong>Email:</strong> <%= c.email %></p>
+                          <p><strong>Phone:</strong> <%= c.phone %></p>
+                          <p><strong>Experience:</strong> <%= c.coachDetails?.experience || '-' %> years</p>
+                        </div>
+                        <div class="col-md-6">
+                          <p><strong>Rate:</strong> Rs.<%= c.coachDetails?.ratePerMonth || '-' %>/month</p>
+                          <p><strong>Specialties:</strong> <%= (c.coachDetails?.specialties || []).join(', ') || '-' %></p>
+                        </div>
+                      </div>
+                      <p><strong>Bio:</strong> <%= c.coachDetails?.bio || '-' %></p>
+                      <p><strong>Certificates:</strong></p>
+                      <ul>
+                        <% (c.coachDetails?.certificates || []).forEach(cert => { %>
+                          <li><i class="bi bi-file-earmark-check text-success me-1"></i> <%= cert.name %></li>
+                        <% }) %>
+                        <% if (!c.coachDetails?.certificates || c.coachDetails.certificates.length === 0) { %>
+                          <li class="text-muted">No certificates uploaded</li>
+                        <% } %>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+            <% if (coaches.length === 0) { %>
+              <tr><td colspan="7" class="text-center text-muted py-5"><i class="bi bi-people fs-2 d-block mb-2"></i>No coaches registered yet</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+  <div class="d-flex align-items-center mb-4">
+    <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+      <i class="bi bi-person fs-2 text-warning"></i>
+    </div>
+    <div>
+      <h2 class="fw-bold mb-0">My Dashboard</h2>
+      <p class="text-muted mb-0">Welcome back, <%= member.name %>!</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card shadow border-0 rounded-4 mb-4 text-center p-4">
+        <div class="bg-warning bg-opacity-10 d-inline-flex p-3 rounded-circle mx-auto mb-3">
+          <i class="bi bi-person-circle fs-1 text-warning"></i>
+        </div>
+        <h4 class="fw-bold"><%= member.name %></h4>
+        <span class="badge bg-<%= member.status === 'approved' ? 'success' : 'warning' %> fs-6 px-3"><%= member.status %></span>
+        <hr>
+        <p class="mb-1 small"><i class="bi bi-envelope"></i> <%= member.email %></p>
+        <p class="mb-0 small"><i class="bi bi-telephone"></i> <%= member.phone %></p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <% if (member.status === 'pending') { %>
+        <div class="alert alert-warning rounded-4 border-0 shadow-sm d-flex align-items-center">
+          <i class="bi bi-hourglass-split fs-3 me-3"></i>
+          <div><strong>Account Pending Approval</strong><br>Your account is under review. You'll be able to select a coach once approved.</div>
+        </div>
+      <% } else if (member.status === 'rejected') { %>
+        <div class="alert alert-danger rounded-4 border-0 shadow-sm">
+          <i class="bi bi-x-circle me-2"></i> Your account has been rejected. Please contact admin.
+        </div>
+      <% } else if (payment) { %>
+        <div class="card shadow border-0 rounded-4 mb-3">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+              <div class="bg-success bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-check-circle-fill text-success fs-4"></i></div>
+              <h5 class="fw-bold mb-0">Membership Active</h5>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <p class="mb-1"><strong>Coach:</strong> <%= payment.coach?.name || 'N/A' %></p>
+                <p class="mb-1"><strong>Paid:</strong> Rs.<%= payment.totalAmount %></p>
+                <p class="mb-0"><strong>Since:</strong> <%= new Date(payment.createdAt).toLocaleDateString() %></p>
+              </div>
+              <div class="col-md-6">
+                <div class="bg-light rounded-3 p-3">
+                  <h6 class="fw-bold text-warning mb-2"><i class="bi bi-telephone"></i> Coach Contact</h6>
+                  <p class="mb-1"><i class="bi bi-envelope me-1"></i> <%= member.selectedCoach?.email || 'N/A' %></p>
+                  <p class="mb-0"><i class="bi bi-telephone me-1"></i> <%= member.selectedCoach?.phone || 'N/A' %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } else if (member.selectedCoach) { %>
+        <div class="card shadow border-0 rounded-4 mb-3">
+          <div class="card-body p-4 text-center">
+            <div class="display-3 mb-2"><i class="bi bi-hand-index-thumb text-warning"></i></div>
+            <h4>Coach Selected: <span class="text-warning"><%= member.selectedCoach?.name || 'N/A' %></span></h4>
+            <p class="text-muted">Complete payment to unlock coach contact details.</p>
+            <a href="/member/coaches" class="btn btn-warning btn-lg fw-bold rounded-pill px-4">Pay Now</a>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="card shadow border-0 rounded-4">
+          <div class="card-body text-center py-5">
+            <div class="display-2 mb-3"><i class="bi bi-search-heart text-warning"></i></div>
+            <h3 class="fw-bold">Find Your Perfect Coach</h3>
+            <p class="text-muted mb-4">Browse our certified coaches and start your fitness journey today.</p>
+            <a href="/member/coaches" class="btn btn-warning btn-lg fw-bold rounded-pill px-5 shadow-lg">Browse Coaches</a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
