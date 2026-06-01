@@ -81,9 +81,10 @@ const sendRegistrationNotification = async (user) => {
 
 const sendApprovalNotification = async (user) => {
   const role = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+  const BASE = process.env.BASE_URL || 'http://localhost:3000';
   const dashboardLink = user.role === 'coach'
-    ? 'http://localhost:' + (process.env.PORT || 3000) + '/coach/dashboard'
-    : 'http://localhost:' + (process.env.PORT || 3000) + '/member/dashboard';
+    ? BASE + '/coach/dashboard'
+    : BASE + '/member/dashboard';
 
   await sendEmail({
     to: user.email,

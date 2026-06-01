@@ -56,9 +56,9 @@ document.getElementById('payhere-button').addEventListener('click', function() {
   var payment = {
     sandbox: <%= process.env.PAYHERE_SANDBOX === 'true' ? 'true' : 'false' %>,
     merchant_id: '<%= payhereMerchantId %>',
-    return_url: 'http://localhost:<%= process.env.PORT || 3000 %>/member/success',
-    cancel_url: 'http://localhost:<%= process.env.PORT || 3000 %>/member/cancel',
-    notify_url: 'http://localhost:<%= process.env.PORT || 3000 %>/payment/notify',
+    return_url: window.location.origin + '/member/success',
+    cancel_url: window.location.origin + '/member/cancel',
+    notify_url: window.location.origin + '/payment/notify',
     order_id: '<%= orderId %>',
     items: 'Coach: <%= coach.name %> - Monthly Membership',
     amount: '<%= total %>',
