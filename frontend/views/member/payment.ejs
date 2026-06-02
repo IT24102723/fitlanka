@@ -41,50 +41,31 @@
             <p class="text-muted small mt-2">Verified by PayHere &mdash; Sri Lanka's Payment Gateway</p>
           </div>
 
-          <button id="payhere-button" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg">
-            <i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now
-          </button>
+          <form id="payhere-form" method="post" action="<%= checkoutUrl %>">
+            <input type="hidden" name="merchant_id" value="<%= payhereMerchantId %>">
+            <input type="hidden" name="return_url" value="<%= returnUrl %>">
+            <input type="hidden" name="cancel_url" value="<%= cancelUrl %>">
+            <input type="hidden" name="notify_url" value="<%= notifyUrl %>">
+            <input type="hidden" name="order_id" value="<%= orderId %>">
+            <input type="hidden" name="items" value="Coach: <%= coach.name %> - Monthly Membership">
+            <input type="hidden" name="currency" value="<%= currency %>">
+            <input type="hidden" name="amount" value="<%= total.toFixed(2) %>">
+            <input type="hidden" name="first_name" value="<%= member.name.split(' ')[0] %>">
+            <input type="hidden" name="last_name" value="<%= member.name.split(' ').slice(1).join(' ') || 'N/A' %>">
+            <input type="hidden" name="email" value="<%= member.email %>">
+            <input type="hidden" name="phone" value="<%= member.phone %>">
+            <input type="hidden" name="address" value="Colombo">
+            <input type="hidden" name="city" value="Colombo">
+            <input type="hidden" name="country" value="Sri Lanka">
+            <input type="hidden" name="hash" value="<%= hash %>">
+            <button id="payhere-button" type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg">
+              <i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now
+            </button>
+          </form>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-function initPayHere(cb) {
-  if (typeof payhere !== 'undefined' && payhere.startPayment) { cb(); return; }
-  var s = document.createElement('script');
-  s.src = 'https://www.payhere.lk/lib/payhere.js';
-  s.onload = cb;
-  document.head.appendChild(s);
-}
-
-document.getElementById('payhere-button').addEventListener('click', function() {
-  var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Loading...';
-  initPayHere(function() {
-    btn.disabled = false; btn.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now';
-    var payment = {
-      sandbox: <%= process.env.PAYHERE_SANDBOX === 'true' ? 'true' : 'false' %>,
-      merchant_id: '<%= payhereMerchantId %>',
-      return_url: window.location.origin + '/member/success',
-      cancel_url: window.location.origin + '/member/cancel',
-      notify_url: window.location.origin + '/payment/notify',
-      order_id: '<%= orderId %>',
-      items: 'Coach: <%= coach.name %> - Monthly Membership',
-      amount: '<%= total %>',
-      currency: '<%= currency %>',
-      first_name: '<%= member.name.split(" ")[0] %>',
-      last_name: '<%= member.name.split(" ").slice(1).join(" ") || "N/A" %>',
-      email: '<%= member.email %>',
-      phone: '<%= member.phone %>',
-      address: 'Colombo',
-      city: 'Colombo',
-      country: 'Sri Lanka',
-      hash: '<%= hash %>'
-    };
-    payhere.startPayment(payment);
-  });
-});
-</script>
 
 <%- include('../partials/footer') %>

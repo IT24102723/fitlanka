@@ -58,6 +58,13 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
     .digest('hex')
     .toUpperCase();
 
+  const baseUrl = process.env.BASE_URL || ('https://' + (process.env.VERCEL_URL || 'localhost:5000'));
+  const returnUrl = baseUrl + '/member/success';
+  const cancelUrl = baseUrl + '/member/cancel';
+  const notifyUrl = baseUrl + '/payment/notify';
+  const isSandbox = process.env.PAYHERE_SANDBOX === 'true' || payhereMerchantId.startsWith('1');
+  const checkoutUrl = isSandbox ? 'https://sandbox.payhere.lk/pay/checkout' : 'https://www.payhere.lk/pay/checkout';
+
   res.render('member/payment', {
     coach,
     member,
@@ -68,6 +75,10 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
     payhereMerchantId,
     currency,
     hash,
+    returnUrl,
+    cancelUrl,
+    notifyUrl,
+    checkoutUrl,
     messages: req.flash()
   });
 });
