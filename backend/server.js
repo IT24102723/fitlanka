@@ -73,6 +73,7 @@ app.use('/coach', require('./routes/coach'));
 app.use('/member', require('./routes/member'));
 app.use('/payment', require('./routes/payment'));
 app.use('/feedback', require('./routes/feedback'));
+app.use('/profile', require('./routes/profile'));
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;

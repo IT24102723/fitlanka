@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="d-flex align-items-center mb-4">
+        <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+          <i class="bi bi-person-gear fs-2 text-warning"></i>
+        </div>
+        <div>
+          <h2 class="fw-bold mb-0">My Profile</h2>
+          <p class="text-muted mb-0">Update your personal information</p>
+        </div>
+      </div>
+
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-4 p-lg-5">
+          <form action="/profile" method="POST" enctype="multipart/form-data">
+            <div class="text-center mb-4">
+              <div class="position-relative d-inline-block">
+                <% if (user.profileImage) { %>
+                  <img src="<%= user.profileImage %>" id="profilePreview" class="rounded-circle shadow" style="width:120px;height:120px;object-fit:cover;">
+                <% } else { %>
+                  <div id="profilePreview" class="rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center mx-auto" style="width:120px;height:120px;">
+                    <i class="bi bi-person-circle fs-1 text-warning"></i>
+                  </div>
+                <% } %>
+                <label for="profileImageInput" class="position-absolute bottom-0 end-0 btn btn-warning btn-sm rounded-circle p-2 shadow" style="cursor:pointer;">
+                  <i class="bi bi-camera"></i>
+                </label>
+                <input type="file" id="profileImageInput" name="profileImage" accept="image/*" class="d-none" onchange="previewProfilePic(event)">
+              </div>
+              <p class="text-muted small mt-2">Click camera icon to change photo</p>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-medium small">Full Name</label>
+                <input type="text" name="name" class="form-control" value="<%= user.name %>" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-medium small">Email</label>
+                <input type="email" name="email" class="form-control" value="<%= user.email %>" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-medium small">Phone Number</label>
+                <input type="text" name="phone" class="form-control" value="<%= user.phone %>" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-medium small">Role</label>
+                <input type="text" class="form-control" value="<%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>" disabled>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+              <button type="submit" class="btn btn-warning fw-bold rounded-pill px-5">
+                <i class="bi bi-check-circle me-1"></i> Save Changes
+              </button>
+              <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function previewProfilePic(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const preview = document.getElementById('profilePreview');
+    if (preview.tagName === 'IMG') {
+      preview.src = ev.target.result;
+    } else {
+      const img = document.createElement('img');
+      img.id = 'profilePreview';
+      img.src = ev.target.result;
+      img.className = 'rounded-circle shadow';
+      img.style.cssText = 'width:120px;height:120px;object-fit:cover;';
+      preview.parentNode.replaceChild(img, preview);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+
+<%- include('partials/footer') %>
