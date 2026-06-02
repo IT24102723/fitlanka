@@ -5,7 +5,6 @@ const Payment = require('../models/Payment');
 const { ensureAuth } = require('../middleware/auth');
 
 const WEBSITE_FEE = 500;
-const USD_RATE = Number(process.env.PAYPAL_USD_RATE) || 330;
 
 const bankDetails = {
   bankName: 'Bank of Ceylon',
@@ -43,7 +42,6 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
 
   const fee = coach.coachDetails.ratePerMonth || 2000;
   const total = fee + WEBSITE_FEE;
-  const usdTotal = (total / USD_RATE).toFixed(2);
 
   let payment = await Payment.findOne({ member: member._id, status: 'pending' });
   if (!payment) {
@@ -54,19 +52,9 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
       websiteFee: WEBSITE_FEE,
       totalAmount: total,
       status: 'pending',
-      paymentMethod: 'paypal'
+      paymentMethod: 'manual'
     });
   }
-
-  const paypalEmail = process.env.PAYPAL_EMAIL;
-  const baseUrl = process.env.BASE_URL || ('https://' + (process.env.VERCEL_URL || 'localhost:5000'));
-  const returnUrl = baseUrl + '/member/success?payment=' + payment._id;
-  const cancelUrl = baseUrl + '/member/cancel';
-  const notifyUrl = baseUrl + '/payment/paypal-ipn';
-  const isSandbox = process.env.PAYPAL_SANDBOX === 'true';
-  const checkoutUrl = isSandbox
-    ? 'https://www.sandbox.paypal.com/cgi-bin/webscr'
-    : 'https://www.paypal.com/cgi-bin/webscr';
 
   res.render('member/payment', {
     coach,
@@ -74,40 +62,43 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
     fee,
     websiteFee: WEBSITE_FEE,
     total,
-    usdTotal,
     payment,
-    paypalEmail,
-    returnUrl,
-    cancelUrl,
-    notifyUrl,
-    checkoutUrl,
-    isSandbox,
     bank: bankDetails,
     messages: req.flash()
   });
 });
 
 router.get('/success', ensureAuth, async (req, res) => {
-  const { payment, st } = req.query;
-
-  if (st === 'Completed' || st === 'completed') {
-    const p = await Payment.findById(payment);
-    if (p && p.status !== 'completed') {
-      p.status = 'completed';
-      p.paymentMethod = 'paypal';
-      await p.save();
-      req.session.user.selectedCoach = (await User.findById(p.member)).selectedCoach;
-    }
-    req.flash('success', 'Payment successful! Coach contact details are now available.');
-  } else {
-    req.flash('success', 'Payment submitted! Confirming with PayPal... Check dashboard shortly.');
-  }
   res.redirect('/member/dashboard');
 });
 
 router.get('/cancel', ensureAuth, async (req, res) => {
   req.flash('error', 'Payment cancelled.');
   res.redirect('/member/coaches');
+});
+
+router.post('/demo-pay/:paymentId', ensureAuth, async (req, res) => {
+  try {
+    const payment = await Payment.findById(req.params.paymentId);
+    if (!payment || payment.member.toString() !== req.session.user.id) {
+      req.flash('error', 'Invalid payment');
+      return res.redirect('/member/dashboard');
+    }
+
+    payment.status = 'completed';
+    payment.paymentMethod = 'demo';
+    payment.notes = 'Demo payment';
+    await payment.save();
+
+    const member = await User.findById(payment.member);
+    if (member) req.session.user.selectedCoach = member.selectedCoach;
+
+    req.flash('success', 'Payment successful! Coach contact details are now available.');
+    res.redirect('/member/dashboard');
+  } catch (err) {
+    req.flash('error', 'Error: ' + err.message);
+    res.redirect('/member/dashboard');
+  }
 });
 
 router.post('/confirm-payment', ensureAuth, async (req, res) => {

@@ -1,12 +1,12 @@
 <%- include('../partials/header') %>
 
 <style>
-  .payment-tab { cursor: pointer; padding: 12px; border-radius: 12px; transition: all 0.2s; border: 2px solid transparent; }
-  .payment-tab:hover { background: #f8f9fa; }
-  .payment-tab.active { border-color: #0070ba; background: #e8f4fd; }
-  .payment-tab input[type="radio"] { display: none; }
-  .payment-option { display: none; }
-  .payment-option.active { display: block; }
+  .demo-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; border-radius: 16px; padding: 20px; font-family: 'Courier New', monospace; }
+  .demo-card .chip { width: 40px; height: 30px; background: #ffd700; border-radius: 6px; margin-bottom: 15px; }
+  .demo-card .card-number { font-size: 1.3rem; letter-spacing: 3px; word-spacing: 8px; margin-bottom: 10px; }
+  .demo-card .card-details { display: flex; gap: 30px; font-size: 0.75rem; }
+  .demo-card .card-details span { opacity: 0.7; }
+  .demo-card .card-details strong { font-size: 0.9rem; }
 </style>
 
 <div class="container py-4">
@@ -15,11 +15,11 @@
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
           <div class="text-center mb-4">
-            <div class="bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
-              <i class="bi bi-paypal fs-1 text-primary"></i>
+            <div class="bg-warning bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
+              <i class="bi bi-credit-card fs-1 text-warning"></i>
             </div>
             <h3 class="fw-bold">Complete Payment</h3>
-            <p class="text-muted">Secure your membership with <%= coach.name %></p>
+            <p class="text-muted">Book your membership with <%= coach.name %></p>
           </div>
 
           <div class="bg-light rounded-4 p-4 mb-4">
@@ -41,26 +41,7 @@
             <hr>
             <div class="d-flex justify-content-between fw-bold fs-5">
               <span>Total</span>
-              <span class="text-primary">Rs. <%= total %> <small class="text-muted fw-normal">(~$<%= usdTotal %> USD)</small></span>
-            </div>
-          </div>
-
-          <div class="row g-2 mb-4">
-            <div class="col-6">
-              <label class="payment-tab active d-block text-center" onclick="switchPayment('paypal')">
-                <input type="radio" name="payMethod" value="paypal" checked>
-                <i class="bi bi-paypal fs-2 d-block mb-1 text-primary"></i>
-                <span class="fw-bold small">PayPal</span>
-                <span class="d-block text-muted" style="font-size:11px">Card / PayPal</span>
-              </label>
-            </div>
-            <div class="col-6">
-              <label class="payment-tab d-block text-center" onclick="switchPayment('manual')">
-                <input type="radio" name="payMethod" value="manual">
-                <i class="bi bi-bank fs-2 d-block mb-1 text-success"></i>
-                <span class="fw-bold small">Bank Transfer</span>
-                <span class="d-block text-muted" style="font-size:11px">Manual payment</span>
-              </label>
+              <span class="text-warning">Rs. <%= total %></span>
             </div>
           </div>
 
@@ -72,62 +53,45 @@
             <a href="/member/dashboard" class="btn btn-outline-secondary w-100 btn-lg rounded-3">Back to Dashboard</a>
           <% } else { %>
 
-            <!-- PayPal Payment -->
-            <div id="paypal-option" class="payment-option active">
-              <div class="text-center mb-3">
-                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="me-1">
-                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="Cards" style="height:30px;">
-                <p class="text-muted small mt-1">Pay with PayPal or credit/debit card</p>
-              </div>
-              <form method="post" action="<%= checkoutUrl %>">
-                <input type="hidden" name="cmd" value="_xclick">
-                <input type="hidden" name="business" value="<%= paypalEmail %>">
-                <input type="hidden" name="item_name" value="<%= coach.name %> - Monthly Membership">
-                <input type="hidden" name="amount" value="<%= usdTotal %>">
-                <input type="hidden" name="currency_code" value="USD">
-                <input type="hidden" name="return" value="<%= returnUrl %>">
-                <input type="hidden" name="cancel_return" value="<%= cancelUrl %>">
-                <input type="hidden" name="notify_url" value="<%= notifyUrl %>">
-                <input type="hidden" name="custom" value="<%= payment._id %>">
-                <input type="hidden" name="no_shipping" value="1">
-                <input type="hidden" name="bn" value="FitLanka_SP">
-                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold rounded-3 shadow-lg" style="background:#0070ba;border-color:#0070ba;">
-                  <i class="bi bi-paypal me-2"></i> Pay $<%= usdTotal %> with PayPal
-                </button>
-              </form>
-              <div class="text-center mt-2">
-                <small class="text-muted">
-                  <i class="bi bi-shield-check"></i> Secure checkout by PayPal
-                </small>
+            <!-- Demo Credit Card -->
+            <div class="demo-card mb-4">
+              <div class="chip"></div>
+              <div class="card-number">4916 1000 0000 0000</div>
+              <div class="card-details">
+                <div><span>VALID THRU</span><br><strong>12/28</strong></div>
+                <div><span>CVV</span><br><strong>123</strong></div>
               </div>
             </div>
 
-            <!-- Manual Bank Transfer -->
-            <div id="manual-option" class="payment-option">
-              <div class="card border-success border-2 rounded-4 mb-3">
-                <div class="card-body p-3">
-                  <div class="text-center mb-2">
-                    <i class="bi bi-building fs-1 text-success"></i>
-                    <h6 class="fw-bold mt-1">Bank Transfer Details</h6>
+            <form method="post" action="/member/demo-pay/<%= payment._id %>">
+              <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg mb-3">
+                <i class="bi bi-lightning-fill me-2"></i> Pay Rs. <%= total %> & Book Now
+              </button>
+            </form>
+
+            <div class="accordion" id="bankAccordion">
+              <div class="accordion-item border-0">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed bg-light fw-medium rounded-3" type="button" data-bs-toggle="collapse" data-bs-target="#bankDetails">
+                    <i class="bi bi-bank me-2"></i> Pay via Bank Transfer
+                  </button>
+                </h2>
+                <div id="bankDetails" class="accordion-collapse collapse" data-bs-parent="#bankAccordion">
+                  <div class="accordion-body px-0">
+                    <table class="table table-borderless mb-3 small">
+                      <tr><td class="text-muted ps-0">Bank:</td><td class="fw-bold text-end"><%= bank.bankName %></td></tr>
+                      <tr><td class="text-muted ps-0">Account Name:</td><td class="fw-bold text-end"><%= bank.accountName %></td></tr>
+                      <tr><td class="text-muted ps-0">Account Number:</td><td class="fw-bold text-end" style="font-size:1.1rem"><%= bank.accountNumber %></td></tr>
+                      <tr><td class="text-muted ps-0">Branch:</td><td class="fw-bold text-end"><%= bank.branch %></td></tr>
+                    </table>
+                    <form method="post" action="/member/confirm-payment">
+                      <input type="hidden" name="paymentId" value="<%= payment._id %>">
+                      <input type="text" name="manualRef" class="form-control rounded-3 mb-2" placeholder="Bank Reference" required>
+                      <button type="submit" class="btn btn-outline-success w-100 rounded-3">Submit Bank Transfer</button>
+                    </form>
                   </div>
-                  <table class="table table-borderless mb-0 small">
-                    <tr><td class="text-muted ps-0">Bank:</td><td class="fw-bold text-end"><%= bank.bankName %></td></tr>
-                    <tr><td class="text-muted ps-0">Account Name:</td><td class="fw-bold text-end"><%= bank.accountName %></td></tr>
-                    <tr><td class="text-muted ps-0">Account No:</td><td class="fw-bold text-end" style="font-size:1.1rem"><%= bank.accountNumber %></td></tr>
-                    <tr><td class="text-muted ps-0">Branch:</td><td class="fw-bold text-end"><%= bank.branch %></td></tr>
-                  </table>
                 </div>
               </div>
-              <form method="post" action="/member/confirm-payment">
-                <input type="hidden" name="paymentId" value="<%= payment._id %>">
-                <div class="mb-3">
-                  <label class="fw-medium mb-2 small">Bank Transaction Reference</label>
-                  <input type="text" name="manualRef" class="form-control rounded-3" placeholder="e.g. BOC25032024001" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100 btn-lg fw-bold rounded-3 shadow-lg">
-                  <i class="bi bi-check-lg me-2"></i> I've Completed the Transfer
-                </button>
-              </form>
             </div>
 
           <% } %>
@@ -136,14 +100,5 @@
     </div>
   </div>
 </div>
-
-<script>
-function switchPayment(method) {
-  document.querySelectorAll('.payment-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
-  document.querySelector(`.payment-tab input[value="${method}"]`).closest('.payment-tab').classList.add('active');
-  document.getElementById(method + '-option').classList.add('active');
-}
-</script>
 
 <%- include('../partials/footer') %>
