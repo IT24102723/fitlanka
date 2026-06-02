@@ -102,7 +102,17 @@
               <input type="hidden" name="name" value="<%= member.name %>">
               <input type="hidden" name="email" value="<%= member.email %>">
               <input type="hidden" name="type" value="coach">
-              <input type="hidden" name="coachId" value="<%= completedPayment.coach?._id || member.selectedCoach?._id %>">
+              <div class="mb-2">
+                <label class="fw-medium small">Select Coach</label>
+                <select class="form-select rounded-3" name="coachId" required>
+                  <option value="">Choose a coach...</option>
+                  <% if (coaches && coaches.length) { %>
+                    <% coaches.forEach(c => { %>
+                      <option value="<%= c._id %>" <%= (completedPayment?.coach?._id && completedPayment.coach._id.toString() === c._id.toString()) ? 'selected' : '' %>><%= c.name %></option>
+                    <% }) %>
+                  <% } %>
+                </select>
+              </div>
               <div class="mb-2">
                 <div class="star-rating-dash">
                   <i class="bi bi-star fs-4 text-warning" data-star="1"></i>

@@ -20,7 +20,8 @@ router.get('/dashboard', ensureAuth, async (req, res) => {
   const member = await User.findById(req.session.user.id).populate('selectedCoach', 'name email phone');
   const completedPayment = await Payment.findOne({ member: member._id, status: 'completed' }).populate('coach', 'name');
   const pendingPayment = await Payment.findOne({ member: member._id, status: 'pending' }).populate('coach', 'name');
-  res.render('member/dashboard', { member, completedPayment, pendingPayment, messages: req.flash() });
+  const coaches = await User.find({ role: 'coach', status: 'approved' }, 'name');
+  res.render('member/dashboard', { member, completedPayment, pendingPayment, coaches, messages: req.flash() });
 });
 
 router.get('/coaches', ensureAuth, async (req, res) => {
