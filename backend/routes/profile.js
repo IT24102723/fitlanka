@@ -37,8 +37,13 @@ router.post('/', ensureAuth, upload.fields([{ name: 'profileImage', maxCount: 1 
     if (phone) user.phone = phone;
 
     const photoFile = req.files?.profileImage?.[0];
-    if (photoFile && uploadImage) {
-      try { user.profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary upload error:', e.message); }
+    if (photoFile) {
+      if (uploadImage) {
+        try { user.profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
+      }
+      if (!user.profileImage) {
+        user.profileImage = 'data:' + photoFile.mimetype + ';base64,' + photoFile.buffer.toString('base64');
+      }
     }
 
     await user.save();

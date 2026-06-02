@@ -34,8 +34,13 @@ router.post('/register', upload.fields([
     const photoFile = req.files?.profileImage?.[0];
 
     let profileImage = '';
-    if (photoFile && uploadImage) {
-      try { profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
+    if (photoFile) {
+      if (uploadImage) {
+        try { profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
+      }
+      if (!profileImage) {
+        profileImage = 'data:' + photoFile.mimetype + ';base64,' + photoFile.buffer.toString('base64');
+      }
     }
 
     const userData = {
