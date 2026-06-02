@@ -67,6 +67,17 @@ app.get('/coach-profile/:id/members-count', async (req, res) => {
   res.json({ count });
 });
 
+app.get('/debug-env', (req, res) => {
+  res.json({
+    MERCHANT_ID: process.env.PAYHERE_MERCHANT_ID || '(empty)',
+    CURRENCY: process.env.PAYHERE_CURRENCY || '(empty)',
+    SANDBOX: process.env.PAYHERE_SANDBOX || '(empty)',
+    SECRET_LEN: (process.env.PAYHERE_SECRET || '').length,
+    BASE_URL: process.env.BASE_URL || '(empty)',
+    VERCEL_URL: process.env.VERCEL_URL || '(empty)'
+  });
+});
+
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
 app.use('/coach', require('./routes/coach'));

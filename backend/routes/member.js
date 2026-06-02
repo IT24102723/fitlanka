@@ -59,7 +59,7 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
     .update(payhereMerchantId + orderId + amount + currency + hashedSecret)
     .digest('hex')
     .toUpperCase();
-  console.log('[Payment] Hash generated:', { merchantId: payhereMerchantId, orderId, amount, currency, hash });
+  console.log('[pay] mid=' + payhereMerchantId + ' oid=' + orderId + ' amt=' + amount + ' cur=' + currency + ' hash=' + hash);
 
   const baseUrl = process.env.BASE_URL || ('https://' + (process.env.VERCEL_URL || 'localhost:5000'));
   const returnUrl = baseUrl + '/member/success';
