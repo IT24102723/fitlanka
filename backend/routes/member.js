@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { generatePaymentHash } = require('payhere-node');
 const User = require('../models/User');
 const Payment = require('../models/Payment');
 const { ensureAuth } = require('../middleware/auth');
@@ -54,8 +53,13 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
   const payhereMerchantId = process.env.PAYHERE_MERCHANT_ID;
   const payhereSecret = process.env.PAYHERE_SECRET;
   const currency = process.env.PAYHERE_CURRENCY || 'LKR';
-  const hash = generatePaymentHash(orderId, Number(total).toFixed(2), payhereMerchantId, payhereSecret, currency);
-  console.log('[Payment] Hash generated:', { merchantId: payhereMerchantId, orderId, amount: Number(total).toFixed(2), currency, hash });
+  const amount = Number(total).toFixed(2);
+  const hashedSecret = crypto.createHash('md5').update(payhereSecret).digest('hex').toUpperCase();
+  const hash = crypto.createHash('md5')
+    .update(payhereMerchantId + orderId + amount + currency + hashedSecret)
+    .digest('hex')
+    .toUpperCase();
+  console.log('[Payment] Hash generated:', { merchantId: payhereMerchantId, orderId, amount, currency, hash });
 
   const baseUrl = process.env.BASE_URL || ('https://' + (process.env.VERCEL_URL || 'localhost:5000'));
   const returnUrl = baseUrl + '/member/success';

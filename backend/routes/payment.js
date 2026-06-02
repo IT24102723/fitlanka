@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { verifyPaymentSignature } = require('payhere-node');
 const Payment = require('../models/Payment');
 
 router.post('/notify', async (req, res) => {
@@ -12,13 +11,13 @@ router.post('/notify', async (req, res) => {
     } = req.body;
 
     const merchantSecret = process.env.PAYHERE_SECRET;
-    const isValid = verifyPaymentSignature(
-      { order_id, payhere_amount, payhere_currency, status_code, md5sig, merchant_id },
-      process.env.PAYHERE_MERCHANT_ID,
-      merchantSecret
-    );
+    const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
+    const localMd5sig = crypto.createHash('md5')
+      .update(merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret)
+      .digest('hex')
+      .toUpperCase();
 
-    if (!isValid) {
+    if (localMd5sig !== md5sig) {
       console.error('PayHere IPN: Hash mismatch');
       return res.status(400).send('Hash mismatch');
     }
