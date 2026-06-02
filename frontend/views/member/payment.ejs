@@ -3,7 +3,7 @@
 <style>
   .payment-tab { cursor: pointer; padding: 12px; border-radius: 12px; transition: all 0.2s; border: 2px solid transparent; }
   .payment-tab:hover { background: #f8f9fa; }
-  .payment-tab.active { border-color: #ffc107; background: #fff9e6; }
+  .payment-tab.active { border-color: #0070ba; background: #e8f4fd; }
   .payment-tab input[type="radio"] { display: none; }
   .payment-option { display: none; }
   .payment-option.active { display: block; }
@@ -15,8 +15,8 @@
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
           <div class="text-center mb-4">
-            <div class="bg-warning bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
-              <i class="bi bi-credit-card fs-1 text-warning"></i>
+            <div class="bg-primary bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
+              <i class="bi bi-paypal fs-1 text-primary"></i>
             </div>
             <h3 class="fw-bold">Complete Payment</h3>
             <p class="text-muted">Secure your membership with <%= coach.name %></p>
@@ -41,17 +41,17 @@
             <hr>
             <div class="d-flex justify-content-between fw-bold fs-5">
               <span>Total</span>
-              <span class="text-warning">Rs. <%= total %></span>
+              <span class="text-primary">Rs. <%= total %> <small class="text-muted fw-normal">(~$<%= usdTotal %> USD)</small></span>
             </div>
           </div>
 
           <div class="row g-2 mb-4">
             <div class="col-6">
-              <label class="payment-tab active d-block text-center" onclick="switchPayment('payhere')">
-                <input type="radio" name="payMethod" value="payhere" checked>
-                <i class="bi bi-credit-card-2-front fs-2 d-block mb-1 text-warning"></i>
-                <span class="fw-bold small">Pay Online</span>
-                <span class="d-block text-muted" style="font-size:11px">Visa / Mastercard</span>
+              <label class="payment-tab active d-block text-center" onclick="switchPayment('paypal')">
+                <input type="radio" name="payMethod" value="paypal" checked>
+                <i class="bi bi-paypal fs-2 d-block mb-1 text-primary"></i>
+                <span class="fw-bold small">PayPal</span>
+                <span class="d-block text-muted" style="font-size:11px">Card / PayPal</span>
               </label>
             </div>
             <div class="col-6">
@@ -72,36 +72,32 @@
             <a href="/member/dashboard" class="btn btn-outline-secondary w-100 btn-lg rounded-3">Back to Dashboard</a>
           <% } else { %>
 
-            <!-- PayHere Card Payment -->
-            <div id="payhere-option" class="payment-option active">
+            <!-- PayPal Payment -->
+            <div id="paypal-option" class="payment-option active">
               <div class="text-center mb-3">
-                <img src="https://www.payhere.lk/images/payhere-logo-white.png" alt="PayHere" class="img-fluid rounded-2" style="max-height:40px;background:#000;padding:8px 16px;">
-                <p class="text-muted small mt-1">Pay securely via PayHere</p>
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="me-1">
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="Cards" style="height:30px;">
+                <p class="text-muted small mt-1">Pay with PayPal or credit/debit card</p>
               </div>
-              <form id="payhere-form" method="post" action="<%= checkoutUrl %>">
-                <input type="hidden" name="merchant_id" value="<%= payhereMerchantId %>">
-                <input type="hidden" name="return_url" value="<%= returnUrl %>">
-                <input type="hidden" name="cancel_url" value="<%= cancelUrl %>">
+              <form method="post" action="<%= checkoutUrl %>">
+                <input type="hidden" name="cmd" value="_xclick">
+                <input type="hidden" name="business" value="<%= paypalEmail %>">
+                <input type="hidden" name="item_name" value="<%= coach.name %> - Monthly Membership">
+                <input type="hidden" name="amount" value="<%= usdTotal %>">
+                <input type="hidden" name="currency_code" value="USD">
+                <input type="hidden" name="return" value="<%= returnUrl %>">
+                <input type="hidden" name="cancel_return" value="<%= cancelUrl %>">
                 <input type="hidden" name="notify_url" value="<%= notifyUrl %>">
-                <input type="hidden" name="order_id" value="<%= orderId %>">
-                <input type="hidden" name="items" value="Coach: <%= coach.name %> - Monthly Membership">
-                <input type="hidden" name="currency" value="<%= currency %>">
-                <input type="hidden" name="amount" value="<%= total.toFixed(2) %>">
-                <input type="hidden" name="first_name" value="<%= member.name.split(' ')[0] %>">
-                <input type="hidden" name="last_name" value="<%= member.name.split(' ').slice(1).join(' ') || 'N/A' %>">
-                <input type="hidden" name="email" value="<%= member.email %>">
-                <input type="hidden" name="phone" value="<%= member.phone %>">
-                <input type="hidden" name="address" value="Colombo">
-                <input type="hidden" name="city" value="Colombo">
-                <input type="hidden" name="country" value="Sri Lanka">
-                <input type="hidden" name="hash" value="<%= hash %>">
-                <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg">
-                  <i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now
+                <input type="hidden" name="custom" value="<%= payment._id %>">
+                <input type="hidden" name="no_shipping" value="1">
+                <input type="hidden" name="bn" value="FitLanka_SP">
+                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold rounded-3 shadow-lg" style="background:#0070ba;border-color:#0070ba;">
+                  <i class="bi bi-paypal me-2"></i> Pay $<%= usdTotal %> with PayPal
                 </button>
               </form>
               <div class="text-center mt-2">
                 <small class="text-muted">
-                  <i class="bi bi-shield-check"></i> Test card: 4916 1000 0000 0000
+                  <i class="bi bi-shield-check"></i> Secure checkout by PayPal
                 </small>
               </div>
             </div>
