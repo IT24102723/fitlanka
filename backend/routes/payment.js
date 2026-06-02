@@ -23,10 +23,11 @@ router.post('/notify', async (req, res) => {
     }
 
     if (status_code == '2') {
-      const payment = await Payment.findOne({ payhereOrderId: order_id });
+      const payment = await Payment.findById(order_id);
       if (payment && payment.status !== 'completed') {
         payment.status = 'completed';
         payment.payherePaymentId = payment_id;
+        payment.paymentMethod = 'payhere';
         await payment.save();
         console.log('Payment completed:', order_id);
       }
