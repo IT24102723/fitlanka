@@ -15,11 +15,11 @@
       <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100 overflow-hidden">
           <div style="height:180px;overflow:hidden;background:linear-gradient(135deg,#0f0c29,#302b63);">
-            <img src="https://images.unsplash.com/photos?w=400&h=200&fit=crop&random=<%= index %>" alt="Coach" style="width:100%;height:100%;object-fit:cover;opacity:0.6;">
+            <img src="<%= c.profileImage || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&h=200&fit=crop' %>" alt="<%= c.name %>" style="width:100%;height:100%;object-fit:cover;opacity:0.8;">
           </div>
           <div class="card-body text-center p-4" style="margin-top:-50px;">
-            <div class="bg-light d-inline-flex p-2 rounded-circle mx-auto mb-2 shadow" style="border:4px solid #fff;">
-              <i class="bi bi-person-circle fs-1 text-secondary"></i>
+            <div style="width:80px;height:80px;margin:0 auto;" class="mb-2">
+              <img src="<%= c.profileImage || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=80&h=80&fit=crop&crop=face' %>" alt="<%= c.name %>" style="width:80px;height:80px;object-fit:cover;border:4px solid #fff;" class="rounded-circle shadow">
             </div>
             <h4 class="fw-bold"><%= c.name %></h4>
             <span class="badge bg-warning text-dark mb-3">Rs.<%= c.coachDetails?.ratePerMonth || 2000 %> / month</span>

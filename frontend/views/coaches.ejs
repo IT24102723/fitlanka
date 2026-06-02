@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="text-center mb-5">
+    <h1 class="fw-bold display-5">Our <span class="text-warning">Certified Coaches</span></h1>
+    <p class="text-muted">Browse our verified fitness professionals across Sri Lanka</p>
+  </div>
+
+  <div class="row g-4">
+    <% coaches.forEach((c, index) => { %>
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100 overflow-hidden">
+          <div style="height:200px;overflow:hidden;">
+            <img src="<%= c.profileImage || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&h=300&fit=crop' %>"
+                 alt="<%= c.name %>"
+                 style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div class="card-body text-center p-4">
+            <h4 class="fw-bold"><%= c.name %></h4>
+            <span class="badge bg-warning text-dark mb-2">Rs.<%= c.coachDetails?.ratePerMonth || 2000 %> / month</span>
+            <hr>
+            <div class="text-start small">
+              <p class="mb-1"><i class="bi bi-clock-history text-warning me-1"></i> <%= c.coachDetails?.experience || '0' %> years exp</p>
+              <p class="mb-1"><i class="bi bi-star text-warning me-1"></i> <%= (c.coachDetails?.specialties || []).join(', ') || 'General' %></p>
+              <p class="text-muted mt-2 mb-0"><%= (c.coachDetails?.bio || '').substring(0, 100) %></p>
+            </div>
+            <a href="/coach-profile/<%= c._id %>" class="btn btn-outline-warning w-100 fw-bold mt-3 rounded-3">
+              View Profile <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+    <% if (!coaches || coaches.length === 0) { %>
+      <div class="col-12 text-center py-5">
+        <div class="display-2 mb-3 text-muted"><i class="bi bi-emoji-frown"></i></div>
+        <h3 class="fw-bold">No Coaches Available Yet</h3>
+        <p class="text-muted">Check back later or register as the first coach!</p>
+        <a href="/register" class="btn btn-warning btn-lg rounded-pill px-5 mt-2">Register as Coach</a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

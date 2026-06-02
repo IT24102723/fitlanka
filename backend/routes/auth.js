@@ -4,6 +4,9 @@ const User = require('../models/User');
 const multer = require('multer');
 const { sendRegistrationNotification, sendLoginVerification } = require('../config/notifications');
 
+let uploadImage;
+try { ({ uploadImage } = require('../config/cloudinary')); } catch (e) {}
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/login', (req, res) => {
@@ -14,7 +17,10 @@ router.get('/register', (req, res) => {
   res.render('register', { messages: req.flash() });
 });
 
-router.post('/register', upload.array('certificates', 5), async (req, res) => {
+router.post('/register', upload.fields([
+  { name: 'profileImage', maxCount: 1 },
+  { name: 'certificates', maxCount: 5 }
+]), async (req, res) => {
   try {
     const { name, email, password, phone, role, experience, specialties, bio, ratePerMonth, age, gender, fitnessGoals, healthConditions } = req.body;
 
@@ -24,28 +30,31 @@ router.post('/register', upload.array('certificates', 5), async (req, res) => {
       return res.redirect('/register');
     }
 
+    const certFiles = req.files?.certificates || [];
+    const photoFile = req.files?.profileImage?.[0];
+
+    let profileImage = '';
+    if (photoFile && uploadImage) {
+      try { profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
+    }
+
     const userData = {
       name,
       email,
       password,
       phone,
-      role
+      role,
+      profileImage
     };
 
     if (role === 'coach') {
-      const certificates = [];
-      if (req.files) {
-        req.files.forEach(file => {
-          certificates.push({ name: file.originalname, file: '' });
-        });
-      }
+      const certificates = certFiles.map(f => ({ name: f.originalname, file: '' }));
       userData.coachDetails = {
         certificates,
         experience,
         specialties: specialties ? (Array.isArray(specialties) ? specialties : [specialties]) : [],
         bio,
-        ratePerMonth: Number(ratePerMonth) || 0,
-        profileImage: ''
+        ratePerMonth: Number(ratePerMonth) || 0
       };
     }
 

@@ -41,7 +41,30 @@ app.get('/', async (req, res) => {
   const User = require('./models/User');
   const totalCoaches = await User.countDocuments({ role: 'coach', status: 'approved' });
   const totalMembers = await User.countDocuments({ role: 'member', status: 'approved' });
-  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers } });
+  const coaches = await User.find({ role: 'coach', status: 'approved' }).sort({ createdAt: -1 }).limit(6);
+  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers }, coaches });
+});
+
+app.get('/coaches', async (req, res) => {
+  const User = require('./models/User');
+  const coaches = await User.find({ role: 'coach', status: 'approved' }).sort({ createdAt: -1 });
+  res.render('coaches', { coaches, messages: req.flash() });
+});
+
+app.get('/coach-profile/:id', async (req, res) => {
+  const User = require('./models/User');
+  const coach = await User.findById(req.params.id);
+  if (!coach || coach.role !== 'coach' || coach.status !== 'approved') {
+    req.flash('error', 'Coach not found');
+    return res.redirect('/');
+  }
+  res.render('coach-profile', { coach, messages: req.flash() });
+});
+
+app.get('/coach-profile/:id/members-count', async (req, res) => {
+  const Payment = require('./models/Payment');
+  const count = await Payment.countDocuments({ coach: req.params.id, status: 'completed' });
+  res.json({ count });
 });
 
 app.use('/', require('./routes/auth'));
