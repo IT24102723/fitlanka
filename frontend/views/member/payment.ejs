@@ -50,29 +50,40 @@
   </div>
 </div>
 
-<script src="https://www.payhere.lk/lib/payhere.js"></script>
 <script>
+function initPayHere(cb) {
+  if (typeof PayHere !== 'undefined' && PayHere.checkout) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://www.payhere.lk/lib/payhere.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
 document.getElementById('payhere-button').addEventListener('click', function() {
-  var payment = {
-    sandbox: <%= process.env.PAYHERE_SANDBOX === 'true' ? 'true' : 'false' %>,
-    merchant_id: '<%= payhereMerchantId %>',
-    return_url: window.location.origin + '/member/success',
-    cancel_url: window.location.origin + '/member/cancel',
-    notify_url: window.location.origin + '/payment/notify',
-    order_id: '<%= orderId %>',
-    items: 'Coach: <%= coach.name %> - Monthly Membership',
-    amount: '<%= total %>',
-    currency: '<%= currency %>',
-    first_name: '<%= member.name.split(" ")[0] %>',
-    last_name: '<%= member.name.split(" ").slice(1).join(" ") || "N/A" %>',
-    email: '<%= member.email %>',
-    phone: '<%= member.phone %>',
-    address: 'Colombo',
-    city: 'Colombo',
-    country: 'Sri Lanka',
-    hash: '<%= hash %>'
-  };
-  PayHere.checkout(payment);
+  var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Loading...';
+  initPayHere(function() {
+    btn.disabled = false; btn.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now';
+    var payment = {
+      sandbox: <%= process.env.PAYHERE_SANDBOX === 'true' ? 'true' : 'false' %>,
+      merchant_id: '<%= payhereMerchantId %>',
+      return_url: window.location.origin + '/member/success',
+      cancel_url: window.location.origin + '/member/cancel',
+      notify_url: window.location.origin + '/payment/notify',
+      order_id: '<%= orderId %>',
+      items: 'Coach: <%= coach.name %> - Monthly Membership',
+      amount: '<%= total %>',
+      currency: '<%= currency %>',
+      first_name: '<%= member.name.split(" ")[0] %>',
+      last_name: '<%= member.name.split(" ").slice(1).join(" ") || "N/A" %>',
+      email: '<%= member.email %>',
+      phone: '<%= member.phone %>',
+      address: 'Colombo',
+      city: 'Colombo',
+      country: 'Sri Lanka',
+      hash: '<%= hash %>'
+    };
+    PayHere.checkout(payment);
+  });
 });
 </script>
 
