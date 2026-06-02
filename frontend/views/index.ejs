@@ -204,47 +204,171 @@
   </div>
 </section>
 
-<!-- ===== TESTIMONIALS ===== -->
-<section class="py-5">
+<!-- ===== FEEDBACK ===== -->
+<section class="py-5" id="feedback">
   <div class="container">
     <div class="text-center mb-5">
-      <span class="badge bg-warning text-dark px-3 py-2 mb-2">TESTIMONIALS</span>
-      <h2 class="fw-bold display-6">What Our <span class="text-warning">Members Say</span></h2>
+      <span class="badge bg-warning text-dark px-3 py-2 mb-2">FEEDBACK</span>
+      <h2 class="fw-bold display-6">What People <span class="text-warning">Say About Us</span></h2>
+      <p class="text-muted">Real feedback from our community</p>
     </div>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
-          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-          <p class="text-muted mb-3">"I found an amazing coach through FitLanka. Lost 10kg in 2 months! The platform is so easy to use."</p>
-          <div class="d-flex align-items-center">
-            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
-            <div><strong>Kasun D.</strong><br><small class="text-muted">Colombo</small></div>
-          </div>
-        </div>
+
+    <!-- Filter -->
+    <div class="row g-2 mb-4 justify-content-center">
+      <div class="col-auto">
+        <select class="form-select rounded-3" id="filterType" onchange="loadFeedback()">
+          <option value="">All Feedback</option>
+          <option value="website">Website</option>
+          <option value="coach">Coaches</option>
+        </select>
       </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
-          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-          <p class="text-muted mb-3">"As a busy professional, I needed a flexible coach. FitLanka connected me with someone who understands my schedule."</p>
-          <div class="d-flex align-items-center">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
-            <div><strong>Saman P.</strong><br><small class="text-muted">Kandy</small></div>
-          </div>
-        </div>
+      <div class="col-auto" id="coachFilterWrap" style="display:none">
+        <select class="form-select rounded-3" id="filterCoach" onchange="loadFeedback()">
+          <option value="">All Coaches</option>
+        </select>
       </div>
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
-          <div class="text-warning mb-3"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-          <p class="text-muted mb-3">"The coaches are highly qualified and the whole process from registration to payment was smooth. Highly recommend!"</p>
-          <div class="d-flex align-items-center">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;">
-            <div><strong>Nadeeka M.</strong><br><small class="text-muted">Galle</small></div>
-          </div>
-        </div>
+      <div class="col-auto">
+        <button class="btn btn-warning rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#feedbackModal">
+          <i class="bi bi-pencil-square me-1"></i> Give Feedback
+        </button>
+      </div>
+    </div>
+
+    <!-- Feedback Cards -->
+    <div class="row g-4" id="feedbackList">
+      <div class="col-12 text-center py-4">
+        <div class="spinner-border text-warning" role="status"></div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold"><i class="bi bi-pencil-square text-warning me-2"></i> Give Feedback</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="feedbackForm">
+          <div class="mb-3">
+            <label class="fw-medium small">Your Name</label>
+            <input type="text" class="form-control rounded-3" name="name" value="<%= user ? user.name : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label class="fw-medium small">Email</label>
+            <input type="email" class="form-control rounded-3" name="email" value="<%= user ? user.email : '' %>" required>
+          </div>
+          <div class="mb-3">
+            <label class="fw-medium small">Feedback Type</label>
+            <select class="form-select rounded-3" name="type" onchange="toggleCoachField()" required>
+              <option value="website">Website</option>
+              <option value="coach">Coach</option>
+            </select>
+          </div>
+          <div class="mb-3" id="coachFieldWrap" style="display:none">
+            <label class="fw-medium small">Select Coach</label>
+            <select class="form-select rounded-3" name="coachId">
+              <option value="">Select a coach...</option>
+              <% if (typeof coaches !== 'undefined' && coaches && coaches.length) { %>
+                <% coaches.forEach(c => { %>
+                  <option value="<%= c._id %>"><%= c.name %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="fw-medium small">Rating</label>
+            <div class="star-rating" id="starRating">
+              <i class="bi bi-star fs-3 text-warning" data-star="1"></i>
+              <i class="bi bi-star fs-3 text-warning" data-star="2"></i>
+              <i class="bi bi-star fs-3 text-warning" data-star="3"></i>
+              <i class="bi bi-star fs-3 text-warning" data-star="4"></i>
+              <i class="bi bi-star fs-3 text-warning" data-star="5"></i>
+              <input type="hidden" name="rating" value="5">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="fw-medium small">Message</label>
+            <textarea class="form-control rounded-3" name="message" rows="3" placeholder="Share your experience..." required></textarea>
+          </div>
+          <div id="feedbackMsg"></div>
+          <button type="submit" class="btn btn-warning w-100 fw-bold rounded-3 py-2" id="submitFeedbackBtn">
+            Submit Feedback
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function loadFeedback() {
+  const type = document.getElementById('filterType').value;
+  const coach = document.getElementById('filterCoach').value;
+  document.getElementById('coachFilterWrap').style.display = type === 'coach' ? 'block' : 'none';
+
+  let url = '/feedback?';
+  if (type) url += 'type=' + type + '&';
+  if (coach) url += 'coach=' + coach;
+
+  fetch(url).then(r => r.json()).then(data => {
+    const container = document.getElementById('feedbackList');
+    if (!data.feedbacks || data.feedbacks.length === 0) {
+      container.innerHTML = '<div class="col-12 text-center py-5"><i class="bi bi-chat-quote fs-1 text-muted d-block mb-2"></i><p class="text-muted">No feedback yet. Be the first!</p></div>';
+      return;
+    }
+    const coachSelect = document.getElementById('filterCoach');
+    if (data.coaches && coachSelect.options.length === 1) {
+      data.coaches.forEach(c => {
+        coachSelect.innerHTML += '<option value="' + c._id + '">' + c.name + '</option>';
+      });
+    }
+    container.innerHTML = data.feedbacks.map(f => {
+      const stars = Array(5).fill().map((_, i) => i < f.rating ? 'bi-star-fill' : 'bi-star').join(' ');
+      return '<div class="col-md-4"><div class="card border-0 shadow-sm h-100 p-4 rounded-4">' +
+        '<div class="text-warning mb-2">' + stars.split(' ').map(s => '<i class="bi ' + s + '"></i>').join('') + '</div>' +
+        '<p class="text-muted mb-3">"' + f.message + '"</p>' +
+        '<div class="d-flex align-items-center mt-auto"><div><strong>' + f.name + '</strong>' +
+        (f.coach ? '<br><small class="text-muted">about ' + f.coach.name + '</small>' : '<br><small class="text-muted">Website feedback</small>') +
+        '</div></div></div></div>';
+    }).join('');
+  });
+}
+
+function toggleCoachField() {
+  document.getElementById('coachFieldWrap').style.display = document.querySelector('[name="type"]').value === 'coach' ? 'block' : 'none';
+}
+
+document.getElementById('starRating').addEventListener('click', function(e) {
+  if (e.target.tagName === 'I') {
+    const val = e.target.dataset.star;
+    this.querySelectorAll('i').forEach(i => {
+      i.className = i.dataset.star <= val ? 'bi bi-star-fill fs-3 text-warning' : 'bi bi-star fs-3 text-warning';
+    });
+    this.querySelector('[name="rating"]').value = val;
+  }
+});
+
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitFeedbackBtn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  const data = Object.fromEntries(new FormData(this));
+  fetch('/feedback', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data) })
+    .then(r => r.json()).then(d => {
+      document.getElementById('feedbackMsg').innerHTML = d.success
+        ? '<div class="alert alert-success py-2">Thank you for your feedback!</div>'
+        : '<div class="alert alert-danger py-2">' + (d.error || 'Failed') + '</div>';
+      if (d.success) { this.reset(); setTimeout(() => { document.getElementById('feedbackMsg').innerHTML = ''; bootstrap.Modal.getInstance(document.getElementById('feedbackModal')).hide(); loadFeedback(); }, 1500); }
+      btn.disabled = false; btn.textContent = 'Submit Feedback';
+    });
+});
+
+loadFeedback();
+</script>
 
 <!-- ===== CTA ===== -->
 <section class="py-5 bg-dark text-white text-center position-relative overflow-hidden">

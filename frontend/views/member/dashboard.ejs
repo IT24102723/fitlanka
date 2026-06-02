@@ -88,8 +88,69 @@
           </div>
         </div>
       <% } %>
+
+      <% if (completedPayment) { %>
+        <div class="card shadow border-0 rounded-4 mt-3">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+              <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-2">
+                <i class="bi bi-star text-warning fs-4"></i>
+              </div>
+              <h5 class="fw-bold mb-0">Rate Your Coach</h5>
+            </div>
+            <form id="dashFeedbackForm">
+              <input type="hidden" name="name" value="<%= member.name %>">
+              <input type="hidden" name="email" value="<%= member.email %>">
+              <input type="hidden" name="type" value="coach">
+              <input type="hidden" name="coachId" value="<%= completedPayment.coach?._id || member.selectedCoach?._id %>">
+              <div class="mb-2">
+                <div class="star-rating-dash">
+                  <i class="bi bi-star fs-4 text-warning" data-star="1"></i>
+                  <i class="bi bi-star fs-4 text-warning" data-star="2"></i>
+                  <i class="bi bi-star fs-4 text-warning" data-star="3"></i>
+                  <i class="bi bi-star fs-4 text-warning" data-star="4"></i>
+                  <i class="bi bi-star fs-4 text-warning" data-star="5"></i>
+                  <input type="hidden" name="rating" value="5">
+                </div>
+              </div>
+              <div class="mb-2">
+                <textarea class="form-control rounded-3" name="message" rows="2" placeholder="Share your experience with <%= completedPayment.coach?.name || 'your coach' %>..." required></textarea>
+              </div>
+              <div id="dashFeedbackMsg"></div>
+              <button type="submit" class="btn btn-warning rounded-pill px-4 fw-medium">Submit Feedback</button>
+            </form>
+          </div>
+        </div>
+      <% } %>
+
     </div>
   </div>
 </div>
+
+<script>
+document.querySelectorAll('.star-rating-dash').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target.tagName === 'I') {
+      const val = e.target.dataset.star;
+      this.querySelectorAll('i').forEach(i => {
+        i.className = i.dataset.star <= val ? 'bi bi-star-fill fs-4 text-warning' : 'bi bi-star fs-4 text-warning';
+      });
+      this.querySelector('[name="rating"]').value = val;
+    }
+  });
+});
+
+document.getElementById('dashFeedbackForm')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(this));
+  fetch('/feedback', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data) })
+    .then(r => r.json()).then(d => {
+      document.getElementById('dashFeedbackMsg').innerHTML = d.success
+        ? '<div class="alert alert-success py-1 small">Thank you! Your feedback helps others.</div>'
+        : '<div class="alert alert-danger py-1 small">' + (d.error || 'Failed') + '</div>';
+      if (d.success) setTimeout(() => document.getElementById('dashFeedbackMsg').innerHTML = '', 3000);
+    });
+});
+</script>
 
 <%- include('../partials/footer') %>
