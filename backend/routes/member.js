@@ -81,23 +81,19 @@ router.post('/demo-pay/:paymentId', ensureAuth, async (req, res) => {
   try {
     const payment = await Payment.findById(req.params.paymentId);
     if (!payment || payment.member.toString() !== req.session.user.id) {
-      req.flash('error', 'Invalid payment');
-      return res.redirect('/member/dashboard');
+      return res.json({ success: false, error: 'Invalid payment' });
     }
 
     payment.status = 'completed';
     payment.paymentMethod = 'demo';
-    payment.notes = 'Demo payment';
     await payment.save();
 
     const member = await User.findById(payment.member);
     if (member) req.session.user.selectedCoach = member.selectedCoach;
 
-    req.flash('success', 'Payment successful! Coach contact details are now available.');
-    res.redirect('/member/dashboard');
+    res.json({ success: true });
   } catch (err) {
-    req.flash('error', 'Error: ' + err.message);
-    res.redirect('/member/dashboard');
+    res.json({ success: false, error: err.message });
   }
 });
 

@@ -1,12 +1,13 @@
 <%- include('../partials/header') %>
 
 <style>
-  .demo-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; border-radius: 16px; padding: 20px; font-family: 'Courier New', monospace; }
-  .demo-card .chip { width: 40px; height: 30px; background: #ffd700; border-radius: 6px; margin-bottom: 15px; }
-  .demo-card .card-number { font-size: 1.3rem; letter-spacing: 3px; word-spacing: 8px; margin-bottom: 10px; }
-  .demo-card .card-details { display: flex; gap: 30px; font-size: 0.75rem; }
-  .demo-card .card-details span { opacity: 0.7; }
-  .demo-card .card-details strong { font-size: 0.9rem; }
+  .card-preview { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; border-radius: 16px; padding: 24px; font-family: 'Courier New', monospace; min-height: 180px; transition: all 0.3s; }
+  .card-preview .chip { width: 40px; height: 30px; background: #ffd700; border-radius: 6px; margin-bottom: 20px; }
+  .card-preview .preview-number { font-size: 1.4rem; letter-spacing: 3px; word-spacing: 8px; margin-bottom: 15px; min-height: 32px; }
+  .card-preview .preview-details { display: flex; gap: 40px; font-size: 0.75rem; }
+  .card-preview .preview-details span { opacity: 0.6; }
+  .card-preview .preview-details strong { font-size: 0.95rem; }
+  .card-preview .card-type-badge { position: absolute; top: 20px; right: 24px; font-size: 1.5rem; opacity: 0.8; }
 </style>
 
 <div class="container py-4">
@@ -53,21 +54,72 @@
             <a href="/member/dashboard" class="btn btn-outline-secondary w-100 btn-lg rounded-3">Back to Dashboard</a>
           <% } else { %>
 
-            <!-- Demo Credit Card -->
-            <div class="demo-card mb-4">
-              <div class="chip"></div>
-              <div class="card-number">4916 1000 0000 0000</div>
-              <div class="card-details">
-                <div><span>VALID THRU</span><br><strong>12/28</strong></div>
-                <div><span>CVV</span><br><strong>123</strong></div>
+            <div id="paymentSuccess" class="d-none">
+              <div class="text-center py-4">
+                <div class="bg-success bg-opacity-10 d-inline-flex p-4 rounded-circle mb-3">
+                  <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                </div>
+                <h4 class="fw-bold">Payment Successful!</h4>
+                <p class="text-muted mb-0">Your membership with <strong><%= coach.name %></strong> is now active.</p>
+                <p class="text-muted">Check your dashboard for coach contact details.</p>
+                <a href="/member/dashboard" class="btn btn-success btn-lg fw-bold rounded-pill px-5 mt-3">Go to Dashboard</a>
               </div>
             </div>
 
-            <form method="post" action="/member/demo-pay/<%= payment._id %>">
-              <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg mb-3">
-                <i class="bi bi-lightning-fill me-2"></i> Pay Rs. <%= total %> & Book Now
+            <form id="cardPaymentForm">
+              <!-- Card Preview -->
+              <div class="position-relative mb-3">
+                <div class="card-preview" id="cardPreview">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="chip"></div>
+                    <div class="card-type-badge" id="cardTypeIcon">💳</div>
+                  </div>
+                  <div class="preview-number" id="previewNumber">4916 1000 0000 0000</div>
+                  <div class="preview-details">
+                    <div><span>CARDHOLDER</span><br><strong id="previewName"><%= member.name.toUpperCase() %></strong></div>
+                    <div><span>EXPIRY</span><br><strong id="previewExpiry">12/28</strong></div>
+                    <div><span>CVV</span><br><strong id="previewCvv">123</strong></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="fw-medium mb-1 small">Card Type</label>
+                <select class="form-select rounded-3" id="cardType" required>
+                  <option value="visa">Visa</option>
+                  <option value="mastercard">Mastercard</option>
+                  <option value="amex">American Express</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="fw-medium mb-1 small">Card Number</label>
+                <input type="text" class="form-control form-control-lg rounded-3" id="cardNumber" placeholder="4916 1000 0000 0000" maxlength="19" required>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-6">
+                  <label class="fw-medium mb-1 small">Expiry Date</label>
+                  <input type="text" class="form-control rounded-3" id="expiry" placeholder="MM/YY" maxlength="5" required>
+                </div>
+                <div class="col-6">
+                  <label class="fw-medium mb-1 small">CVV</label>
+                  <input type="text" class="form-control rounded-3" id="cvv" placeholder="123" maxlength="4" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="fw-medium mb-1 small">Cardholder Name</label>
+                <input type="text" class="form-control rounded-3" id="cardName" value="<%= member.name %>" required>
+              </div>
+
+              <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg" id="payBtn">
+                <span id="payBtnText">Pay Rs. <%= total %></span>
+                <span id="payBtnSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
               </button>
             </form>
+
+            <hr class="my-3">
 
             <div class="accordion" id="bankAccordion">
               <div class="accordion-item border-0">
@@ -100,5 +152,67 @@
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById('cardNumber').addEventListener('input', function(e) {
+  let val = this.value.replace(/\D/g, '').substring(0, 16);
+  let formatted = val.replace(/(.{4})/g, '$1 ').trim();
+  this.value = formatted;
+  document.getElementById('previewNumber').textContent = formatted || '4916 1000 0000 0000';
+});
+
+document.getElementById('expiry').addEventListener('input', function(e) {
+  let val = this.value.replace(/\D/g, '').substring(0, 4);
+  if (val.length > 2) val = val.substring(0, 2) + '/' + val.substring(2);
+  this.value = val;
+  document.getElementById('previewExpiry').textContent = val || '12/28';
+});
+
+document.getElementById('cvv').addEventListener('input', function(e) {
+  this.value = this.value.replace(/\D/g, '').substring(0, 4);
+  document.getElementById('previewCvv').textContent = this.value || '123';
+});
+
+document.getElementById('cardName').addEventListener('input', function(e) {
+  document.getElementById('previewName').textContent = this.value.toUpperCase() || '<%= member.name.toUpperCase() %>';
+});
+
+document.getElementById('cardType').addEventListener('input', function() {
+  const icons = { visa: '💳', mastercard: '💳', amex: '💳' };
+  document.getElementById('cardTypeIcon').textContent = icons[this.value] || '💳';
+});
+
+document.getElementById('cardPaymentForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('payBtn');
+  const text = document.getElementById('payBtnText');
+  const spinner = document.getElementById('payBtnSpinner');
+  btn.disabled = true;
+  text.textContent = 'Processing...';
+  spinner.classList.remove('d-none');
+
+  setTimeout(() => {
+    fetch('/member/demo-pay/<%= payment._id %>', { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('cardPaymentForm').classList.add('d-none');
+          document.getElementById('paymentSuccess').classList.remove('d-none');
+        } else {
+          alert('Payment failed. Please try again.');
+          btn.disabled = false;
+          text.textContent = 'Pay Rs. <%= total %>';
+          spinner.classList.add('d-none');
+        }
+      })
+      .catch(() => {
+        alert('Error processing payment.');
+        btn.disabled = false;
+        text.textContent = 'Pay Rs. <%= total %>';
+        spinner.classList.add('d-none');
+      });
+  }, 2000);
+});
+</script>
 
 <%- include('../partials/footer') %>
