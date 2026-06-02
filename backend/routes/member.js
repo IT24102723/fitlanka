@@ -53,8 +53,9 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
   const payhereMerchantId = process.env.PAYHERE_MERCHANT_ID;
   const payhereSecret = process.env.PAYHERE_SECRET;
   const currency = process.env.PAYHERE_CURRENCY || 'LKR';
+  const hashedSecret = crypto.createHash('md5').update(payhereSecret).digest('hex').toUpperCase();
   const hash = crypto.createHash('md5')
-    .update(payhereMerchantId + orderId + total.toFixed(2) + currency + '0' + payhereSecret)
+    .update(payhereMerchantId + orderId + total.toFixed(2) + currency + hashedSecret)
     .digest('hex')
     .toUpperCase();
 

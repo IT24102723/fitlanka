@@ -11,8 +11,9 @@ router.post('/notify', async (req, res) => {
     } = req.body;
 
     const merchantSecret = process.env.PAYHERE_SECRET;
+    const hashedSecret = crypto.createHash('md5').update(merchantSecret).digest('hex').toUpperCase();
     const localMd5sig = crypto.createHash('md5')
-      .update(merchant_id + order_id + payhere_amount + payhere_currency + status_code + merchantSecret)
+      .update(merchant_id + order_id + payhere_amount + payhere_currency + status_code + hashedSecret)
       .digest('hex')
       .toUpperCase();
 
