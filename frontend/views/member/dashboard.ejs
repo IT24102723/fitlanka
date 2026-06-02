@@ -33,12 +33,12 @@
         <div class="alert alert-danger rounded-4 border-0 shadow-sm">
           <i class="bi bi-x-circle me-2"></i> Your account has been rejected. Please contact admin.
         </div>
-      <% } else if (payment) { %>
+      <% } else if (completedPayment) { %>
         <div class="card shadow border-0 rounded-4 mb-3">
           <div class="card-body p-4">
               <div class="d-flex align-items-center mb-3">
-                  <% if (payment.coach && payment.coach.profileImage) { %>
-                    <img src="<%= payment.coach.profileImage %>" style="width:40px;height:40px;object-fit:cover;" class="rounded-circle me-2 shadow-sm">
+                  <% if (completedPayment.coach && completedPayment.coach.profileImage) { %>
+                    <img src="<%= completedPayment.coach.profileImage %>" style="width:40px;height:40px;object-fit:cover;" class="rounded-circle me-2 shadow-sm">
                   <% } else { %>
                     <div class="bg-success bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-check-circle-fill text-success fs-4"></i></div>
                   <% } %>
@@ -46,9 +46,9 @@
             </div>
             <div class="row">
               <div class="col-md-6">
-                <p class="mb-1"><strong>Coach:</strong> <%= payment.coach?.name || 'N/A' %></p>
-                <p class="mb-1"><strong>Paid:</strong> Rs.<%= payment.totalAmount %></p>
-                <p class="mb-0"><strong>Since:</strong> <%= new Date(payment.createdAt).toLocaleDateString() %></p>
+                <p class="mb-1"><strong>Coach:</strong> <%= completedPayment.coach?.name || 'N/A' %></p>
+                <p class="mb-1"><strong>Paid:</strong> Rs.<%= completedPayment.totalAmount %></p>
+                <p class="mb-0"><strong>Since:</strong> <%= new Date(completedPayment.createdAt).toLocaleDateString() %></p>
               </div>
               <div class="col-md-6">
                 <div class="bg-light rounded-3 p-3">
@@ -60,13 +60,22 @@
             </div>
           </div>
         </div>
+      <% } else if (pendingPayment && pendingPayment.manualRef) { %>
+        <div class="card shadow border-0 rounded-4 mb-3">
+          <div class="card-body p-4 text-center">
+            <div class="display-3 mb-2"><i class="bi bi-clock-history text-warning"></i></div>
+            <h4>Payment Awaiting Confirmation</h4>
+            <p class="text-muted">Your bank transfer (ref: <strong><%= pendingPayment.manualRef %></strong>) is being reviewed. Admin will confirm within 24 hours.</p>
+            <a href="/member/select-coach/<%= member.selectedCoach._id %>" class="btn btn-outline-warning btn-lg fw-bold rounded-pill px-4">View Payment Details</a>
+          </div>
+        </div>
       <% } else if (member.selectedCoach) { %>
         <div class="card shadow border-0 rounded-4 mb-3">
           <div class="card-body p-4 text-center">
             <div class="display-3 mb-2"><i class="bi bi-hand-index-thumb text-warning"></i></div>
             <h4>Coach Selected: <span class="text-warning"><%= member.selectedCoach?.name || 'N/A' %></span></h4>
             <p class="text-muted">Complete payment to unlock coach contact details.</p>
-            <a href="/member/coaches" class="btn btn-warning btn-lg fw-bold rounded-pill px-4">Pay Now</a>
+            <a href="/member/select-coach/<%= member.selectedCoach._id %>" class="btn btn-warning btn-lg fw-bold rounded-pill px-4">Pay Now</a>
           </div>
         </div>
       <% } else { %>

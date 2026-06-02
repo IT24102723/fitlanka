@@ -19,6 +19,13 @@ const paymentSchema = new mongoose.Schema({
     enum: ['pending', 'completed', 'failed'],
     default: 'pending'
   },
+  paymentMethod: {
+    type: String,
+    enum: ['payhere', 'manual'],
+    default: 'payhere'
+  },
+  manualRef: { type: String },
+  notes: { type: String },
   payhereOrderId: { type: String },
   payherePaymentId: { type: String },
   createdAt: { type: Date, default: Date.now }

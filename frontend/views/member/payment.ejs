@@ -6,8 +6,8 @@
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
           <div class="text-center mb-4">
-            <div class="bg-warning bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
-              <i class="bi bi-credit-card fs-1 text-warning"></i>
+            <div class="bg-success bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
+              <i class="bi bi-bank fs-1 text-success"></i>
             </div>
             <h3 class="fw-bold">Complete Payment</h3>
             <p class="text-muted">Secure your membership with <%= coach.name %></p>
@@ -32,36 +32,48 @@
             <hr>
             <div class="d-flex justify-content-between fw-bold fs-5">
               <span>Total</span>
-              <span class="text-warning">Rs. <%= total %></span>
+              <span class="text-success">Rs. <%= total %></span>
             </div>
           </div>
 
-          <div class="text-center mb-4">
-            <img src="https://www.payhere.lk/images/payhere-logo-white.png" alt="PayHere" class="img-fluid rounded-2" style="max-height:44px;background:#000;padding:10px 20px;">
-            <p class="text-muted small mt-2">Verified by PayHere &mdash; Sri Lanka's Payment Gateway</p>
+          <div class="card border-success border-2 rounded-4 mb-4">
+            <div class="card-body p-4">
+              <div class="text-center mb-3">
+                <i class="bi bi-building fs-1 text-success"></i>
+                <h5 class="fw-bold mt-2">Bank Transfer Details</h5>
+              </div>
+              <table class="table table-borderless mb-0 small">
+                <tr><td class="text-muted ps-0">Bank:</td><td class="fw-bold text-end"><%= bank.bankName %></td></tr>
+                <tr><td class="text-muted ps-0">Account Name:</td><td class="fw-bold text-end"><%= bank.accountName %></td></tr>
+                <tr><td class="text-muted ps-0">Account Number:</td><td class="fw-bold text-end" style="font-size:1.1rem"><%= bank.accountNumber %></td></tr>
+                <tr><td class="text-muted ps-0">Branch:</td><td class="fw-bold text-end"><%= bank.branch %></td></tr>
+              </table>
+            </div>
           </div>
 
-          <form id="payhere-form" method="post" action="<%= checkoutUrl %>">
-            <input type="hidden" name="merchant_id" value="<%= payhereMerchantId %>">
-            <input type="hidden" name="return_url" value="<%= returnUrl %>">
-            <input type="hidden" name="cancel_url" value="<%= cancelUrl %>">
-            <input type="hidden" name="notify_url" value="<%= notifyUrl %>">
-            <input type="hidden" name="order_id" value="<%= orderId %>">
-            <input type="hidden" name="items" value="Coach: <%= coach.name %> - Monthly Membership">
-            <input type="hidden" name="currency" value="<%= currency %>">
-            <input type="hidden" name="amount" value="<%= total.toFixed(2) %>">
-            <input type="hidden" name="first_name" value="<%= member.name.split(' ')[0] %>">
-            <input type="hidden" name="last_name" value="<%= member.name.split(' ').slice(1).join(' ') || 'N/A' %>">
-            <input type="hidden" name="email" value="<%= member.email %>">
-            <input type="hidden" name="phone" value="<%= member.phone %>">
-            <input type="hidden" name="address" value="Colombo">
-            <input type="hidden" name="city" value="Colombo">
-            <input type="hidden" name="country" value="Sri Lanka">
-            <input type="hidden" name="hash" value="<%= hash %>">
-            <button id="payhere-button" type="submit" class="btn btn-warning w-100 btn-lg fw-bold rounded-3 shadow-lg">
-              <i class="bi bi-lock-fill me-2"></i> Pay Rs. <%= total %> Now
-            </button>
-          </form>
+          <div class="alert alert-info rounded-4 border-0 d-flex align-items-center">
+            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+            <div class="small">After making the bank transfer, enter your transaction reference below. Admin will confirm your payment within 24 hours.</div>
+          </div>
+
+          <% if (payment.manualRef) { %>
+            <div class="alert alert-success rounded-4 border-0 d-flex align-items-center">
+              <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+              <div><strong>Payment submitted!</strong><br>Reference: <strong><%= payment.manualRef %></strong><br>Waiting for admin confirmation.</div>
+            </div>
+            <a href="/member/dashboard" class="btn btn-outline-secondary w-100 btn-lg rounded-3">Back to Dashboard</a>
+          <% } else { %>
+            <form method="post" action="/member/confirm-payment">
+              <input type="hidden" name="paymentId" value="<%= payment._id %>">
+              <div class="mb-3">
+                <label class="fw-medium mb-2">Bank Transaction Reference</label>
+                <input type="text" name="manualRef" class="form-control form-control-lg rounded-3" placeholder="e.g. BOC25032024001" required>
+              </div>
+              <button type="submit" class="btn btn-success w-100 btn-lg fw-bold rounded-3 shadow-lg">
+                <i class="bi bi-check-lg me-2"></i> I've Completed the Transfer
+              </button>
+            </form>
+          <% } %>
         </div>
       </div>
     </div>

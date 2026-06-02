@@ -14,7 +14,8 @@ router.get('/dashboard', async (req, res) => {
   const totalCoaches = await User.countDocuments({ role: 'coach', status: 'approved' });
   const totalMembers = await User.countDocuments({ role: 'member', status: 'approved' });
   const totalPayments = await Payment.countDocuments({ status: 'completed' });
-  res.render('admin/dashboard', { pendingCoaches, pendingMembers, totalCoaches, totalMembers, totalPayments, messages: req.flash() });
+  const pendingPayments = await Payment.countDocuments({ status: 'pending' });
+  res.render('admin/dashboard', { pendingCoaches, pendingMembers, totalCoaches, totalMembers, totalPayments, pendingPayments, messages: req.flash() });
 });
 
 router.get('/coaches', async (req, res) => {
@@ -128,8 +129,21 @@ router.post('/reject/:id', async (req, res) => {
 });
 
 router.get('/payments', async (req, res) => {
-  const payments = await Payment.find({ status: 'completed' }).populate('member coach', 'name email phone').sort({ createdAt: -1 });
-  res.render('admin/payments', { payments, messages: req.flash() });
+  const pending = await Payment.find({ status: 'pending' }).populate('member coach', 'name email phone').sort({ createdAt: -1 });
+  const completed = await Payment.find({ status: 'completed' }).populate('member coach', 'name email phone').sort({ createdAt: -1 });
+  res.render('admin/payments', { pending, completed, pendingCount: pending.length, messages: req.flash() });
+});
+
+router.post('/payments/confirm/:id', async (req, res) => {
+  try {
+    const payment = await Payment.findByIdAndUpdate(req.params.id, { status: 'completed', notes: 'Confirmed by admin' }, { new: true });
+    if (!payment) { req.flash('error', 'Payment not found'); return res.redirect('back'); }
+    req.flash('success', 'Payment confirmed successfully');
+    res.redirect('back');
+  } catch (err) {
+    req.flash('error', 'Error confirming payment: ' + err.message);
+    res.redirect('back');
+  }
 });
 
 module.exports = router;
