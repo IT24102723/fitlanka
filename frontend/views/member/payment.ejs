@@ -52,7 +52,7 @@
 
 <script>
 function initPayHere(cb) {
-  if (typeof PayHere !== 'undefined' && PayHere.checkout) { cb(); return; }
+  if (typeof payhere !== 'undefined' && payhere.startPayment) { cb(); return; }
   var s = document.createElement('script');
   s.src = 'https://www.payhere.lk/lib/payhere.js';
   s.onload = cb;
@@ -82,7 +82,7 @@ document.getElementById('payhere-button').addEventListener('click', function() {
       country: 'Sri Lanka',
       hash: '<%= hash %>'
     };
-    PayHere.checkout(payment);
+    payhere.startPayment(payment);
   });
 });
 </script>
