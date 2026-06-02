@@ -21,8 +21,8 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['payhere', 'manual'],
-    default: 'payhere'
+    enum: ['payhere', 'manual', 'demo'],
+    default: 'manual'
   },
   manualRef: { type: String },
   notes: { type: String },
