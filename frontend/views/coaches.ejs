@@ -8,23 +8,13 @@
 
   <div class="row justify-content-center mb-4">
     <div class="col-md-3">
-      <select class="form-select" id="coachFilterDistrict" onchange="filterCoaches()">
+      <select class="form-select" id="coachFilterDistrict">
         <option value="">All Districts</option>
-        <% if (typeof districts !== 'undefined' && districts.length) { %>
-          <% districts.forEach(d => { %>
-            <option value="<%= d %>" <%= filterDistrict === d ? 'selected' : '' %>><%= d %></option>
-          <% }) %>
-        <% } %>
       </select>
     </div>
     <div class="col-md-3">
-      <select class="form-select" id="coachFilterCity" <%= filterDistrict ? '' : 'disabled' %>>
+      <select class="form-select" id="coachFilterCity" disabled>
         <option value="">All Cities</option>
-        <% if (typeof cities !== 'undefined' && cities.length) { %>
-          <% cities.forEach(c => { %>
-            <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
-          <% }) %>
-        <% } %>
       </select>
     </div>
     <div class="col-auto">
@@ -70,6 +60,26 @@
 </div>
 
 <script>
+(function() {
+  var ds = document.getElementById('coachFilterDistrict');
+  allDistricts.forEach(function(d) {
+    ds.innerHTML += '<option value="' + d + '"' + ('<%- filterDistrict %>' === d ? ' selected' : '') + '>' + d + '</option>';
+  });
+  coachDistrictChange();
+})();
+function coachDistrictChange() {
+  var d = document.getElementById('coachFilterDistrict').value;
+  var cs = document.getElementById('coachFilterCity');
+  cs.innerHTML = '<option value="">All Cities</option>';
+  if (d && districtCities[d]) {
+    districtCities[d].forEach(function(c) {
+      cs.innerHTML += '<option value="' + c + '"' + ('<%- filterCity %>' === c ? ' selected' : '') + '>' + c + '</option>';
+    });
+    cs.disabled = false;
+  } else {
+    cs.disabled = true;
+  }
+}
 function filterCoaches() {
   var d = document.getElementById('coachFilterDistrict').value;
   var c = document.getElementById('coachFilterCity').value;
@@ -78,17 +88,6 @@ function filterCoaches() {
   if (c) params.push('city=' + encodeURIComponent(c));
   window.location = '/coaches' + (params.length ? '?' + params.join('&') : '');
 }
-document.getElementById('coachFilterDistrict').addEventListener('change', function() {
-  var d = this.value;
-  var cs = document.getElementById('coachFilterCity');
-  if (d && districtCities[d]) {
-    cs.innerHTML = '<option value="">All Cities</option>';
-    districtCities[d].forEach(function(c) { cs.innerHTML += '<option value="' + c + '">' + c + '</option>'; });
-    cs.disabled = false;
-  } else {
-    cs.innerHTML = '<option value="">All Cities</option>';
-    cs.disabled = true;
-  }
-});
+document.getElementById('coachFilterDistrict').addEventListener('change', coachDistrictChange);
 </script>
 <%- include('partials/footer') %>

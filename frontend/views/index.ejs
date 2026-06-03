@@ -146,23 +146,13 @@
     </div>
     <div class="row justify-content-center mb-4">
       <div class="col-auto">
-        <select class="form-select" id="homeFilterDistrict" onchange="filterHome()">
+        <select class="form-select" id="homeFilterDistrict" onchange="homeDistrictChange()">
           <option value="">All Districts</option>
-          <% if (typeof districts !== 'undefined' && districts.length) { %>
-            <% districts.forEach(d => { %>
-              <option value="<%= d %>" <%= filterDistrict === d ? 'selected' : '' %>><%= d %></option>
-            <% }) %>
-          <% } %>
         </select>
       </div>
       <div class="col-auto">
-        <select class="form-select" id="homeFilterCity" <%= filterDistrict ? '' : 'disabled' %>>
+        <select class="form-select" id="homeFilterCity" disabled>
           <option value="">All Cities</option>
-          <% if (typeof cities !== 'undefined' && cities.length) { %>
-            <% cities.forEach(c => { %>
-              <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
-            <% }) %>
-          <% } %>
         </select>
       </div>
       <div class="col-auto">
@@ -250,6 +240,7 @@
     marker.on('mouseout', function() { this.closePopup(); });
   });
 })();
+initHomeFilters();
 </script>
 
 <!-- ===== FEATURED COACHES PREVIEW ===== -->
@@ -486,6 +477,26 @@ document.getElementById('feedbackForm').addEventListener('submit', function(e) {
 
 loadFeedback();
 
+function initHomeFilters() {
+  var ds = document.getElementById('homeFilterDistrict');
+  allDistricts.forEach(function(d) {
+    ds.innerHTML += '<option value="' + d + '"' + ('<%- filterDistrict %>' === d ? ' selected' : '') + '>' + d + '</option>';
+  });
+  homeDistrictChange();
+}
+function homeDistrictChange() {
+  var d = document.getElementById('homeFilterDistrict').value;
+  var cs = document.getElementById('homeFilterCity');
+  cs.innerHTML = '<option value="">All Cities</option>';
+  if (d && districtCities[d]) {
+    districtCities[d].forEach(function(c) {
+      cs.innerHTML += '<option value="' + c + '"' + ('<%- filterCity %>' === c ? ' selected' : '') + '>' + c + '</option>';
+    });
+    cs.disabled = false;
+  } else {
+    cs.disabled = true;
+  }
+}
 function filterHome() {
   var d = document.getElementById('homeFilterDistrict').value;
   var c = document.getElementById('homeFilterCity').value;
@@ -494,18 +505,6 @@ function filterHome() {
   if (c) params.push('city=' + encodeURIComponent(c));
   window.location = '/?' + params.join('&');
 }
-document.getElementById('homeFilterDistrict').addEventListener('change', function() {
-  var d = this.value;
-  var cs = document.getElementById('homeFilterCity');
-  if (d && districtCities[d]) {
-    cs.innerHTML = '<option value="">All Cities</option>';
-    districtCities[d].forEach(function(c) { cs.innerHTML += '<option value="' + c + '">' + c + '</option>'; });
-    cs.disabled = false;
-  } else {
-    cs.innerHTML = '<option value="">All Cities</option>';
-    cs.disabled = true;
-  }
-});
 </script>
 
 <!-- ===== CTA ===== -->
