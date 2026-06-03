@@ -80,7 +80,7 @@
 <script>
 (function() {
   var ds = document.getElementById('profDistrict');
-  allDistricts.forEach(function(d) { ds.innerHTML += '<option value="' + d + '"' + ('<%- user.district %>' === d ? ' selected' : '') + '>' + d + '</option>'; });
+  allDistricts.forEach(function(d) { var o = new Option(d, d); if ('<%- user.district %>' === d) o.selected = true; ds.appendChild(o); });
   if ('<%- user.district %>') { updateCityDropdown('profDistrict', 'profCity', '<%- user.city %>'); }
 })();
 function previewProfilePic(e) {

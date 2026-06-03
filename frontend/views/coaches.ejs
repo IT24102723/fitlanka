@@ -63,17 +63,22 @@
 (function() {
   var ds = document.getElementById('coachFilterDistrict');
   allDistricts.forEach(function(d) {
-    ds.innerHTML += '<option value="' + d + '"' + ('<%- filterDistrict %>' === d ? ' selected' : '') + '>' + d + '</option>';
+    var o = new Option(d, d);
+    if ('<%- filterDistrict %>' === d) o.selected = true;
+    ds.appendChild(o);
   });
   coachDistrictChange();
 })();
 function coachDistrictChange() {
   var d = document.getElementById('coachFilterDistrict').value;
   var cs = document.getElementById('coachFilterCity');
-  cs.innerHTML = '<option value="">All Cities</option>';
+  cs.innerHTML = '';
+  cs.appendChild(new Option('All Cities', ''));
   if (d && districtCities[d]) {
     districtCities[d].forEach(function(c) {
-      cs.innerHTML += '<option value="' + c + '"' + ('<%- filterCity %>' === c ? ' selected' : '') + '>' + c + '</option>';
+      var o = new Option(c, c);
+      if ('<%- filterCity %>' === c) o.selected = true;
+      cs.appendChild(o);
     });
     cs.disabled = false;
   } else {

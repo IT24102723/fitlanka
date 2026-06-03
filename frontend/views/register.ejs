@@ -156,7 +156,7 @@ document.querySelectorAll('input[name="roleRadio"]').forEach(radio => {
 });
 (function() {
   var sel = document.getElementById('regDistrict');
-  if (sel) { allDistricts.forEach(function(d) { sel.innerHTML += '<option value="' + d + '">' + d + '</option>'; }); }
+  if (sel) { allDistricts.forEach(function(d) { sel.appendChild(new Option(d, d)); }); }
 })();
 </script>
 

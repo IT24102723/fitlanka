@@ -162,15 +162,16 @@
 <script>
 (function() {
   var ds = document.getElementById('homeFilterDistrict');
-  allDistricts.forEach(function(d) { ds.innerHTML += '<option value="' + d + '">' + d + '</option>'; });
+  allDistricts.forEach(function(d) { ds.appendChild(new Option(d, d)); });
   var fd = '<%- filterDistrict %>';
   if (fd) { ds.value = fd; homeDistrictChange(); }
   function homeDistrictChange() {
     var d = ds.value;
     var cs = document.getElementById('homeFilterCity');
-    cs.innerHTML = '<option value="">All Cities</option>';
+    cs.innerHTML = '';
+    cs.appendChild(new Option('All Cities', ''));
     if (d && districtCities[d]) {
-      districtCities[d].forEach(function(c) { cs.innerHTML += '<option value="' + c + '"' + ('<%- filterCity %>' === c ? ' selected' : '') + '>' + c + '</option>'; });
+      districtCities[d].forEach(function(c) { var o = new Option(c, c); if ('<%- filterCity %>' === c) o.selected = true; cs.appendChild(o); });
       cs.disabled = false;
     } else { cs.disabled = true; }
   }

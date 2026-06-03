@@ -30,10 +30,13 @@ var allDistricts = Object.keys(districtCities);
 function updateCityDropdown(districtSelectId, citySelectId, selectedCity) {
   var district = document.getElementById(districtSelectId).value;
   var citySelect = document.getElementById(citySelectId);
-  citySelect.innerHTML = '<option value="">Select your city</option>';
+  citySelect.innerHTML = '';
+  citySelect.appendChild(new Option('Select your city', ''));
   if (district && districtCities[district]) {
     districtCities[district].forEach(function(c) {
-      citySelect.innerHTML += '<option value="' + c + '"' + (c === selectedCity ? ' selected' : '') + '>' + c + '</option>';
+      var opt = new Option(c, c);
+      if (c === selectedCity) opt.selected = true;
+      citySelect.appendChild(opt);
     });
     citySelect.disabled = false;
   } else {
