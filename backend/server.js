@@ -41,14 +41,22 @@ app.get('/', async (req, res) => {
   const User = require('./models/User');
   const totalCoaches = await User.countDocuments({ role: 'coach', status: 'approved' });
   const totalMembers = await User.countDocuments({ role: 'member', status: 'approved' });
-  const coaches = await User.find({ role: 'coach', status: 'approved' }).sort({ createdAt: -1 }).limit(6);
-  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers }, coaches });
+  const filterCity = req.query.city || '';
+  const coachQuery = { role: 'coach', status: 'approved' };
+  if (filterCity) coachQuery.city = filterCity;
+  const coaches = await User.find(coachQuery).sort({ createdAt: -1 }).limit(6);
+  const cities = await User.distinct('city', { role: 'coach', status: 'approved', city: { $ne: '' } });
+  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers }, coaches, cities, filterCity });
 });
 
 app.get('/coaches', async (req, res) => {
   const User = require('./models/User');
-  const coaches = await User.find({ role: 'coach', status: 'approved' }).sort({ createdAt: -1 });
-  res.render('coaches', { coaches, messages: req.flash() });
+  const filterCity = req.query.city || '';
+  const query = { role: 'coach', status: 'approved' };
+  if (filterCity) query.city = filterCity;
+  const coaches = await User.find(query).sort({ createdAt: -1 });
+  const cities = await User.distinct('city', { role: 'coach', status: 'approved', city: { $ne: '' } });
+  res.render('coaches', { coaches, cities, filterCity, messages: req.flash() });
 });
 
 app.get('/coach-profile/:id', async (req, res) => {

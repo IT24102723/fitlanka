@@ -63,6 +63,10 @@ body {
 .dark-mode .table-striped > tbody > tr:nth-of-type(odd) { background: rgba(255,255,255,0.03); }
 .dark-mode ::-webkit-scrollbar-track { background: #1e1e1e; }
 .dark-mode #feedback .card { background: var(--card-bg); }
+.dark-mode #map { filter: invert(0.9) hue-rotate(180deg); }
+.dark-mode #map .leaflet-control-attribution { display: none; }
+.dark-mode .leaflet-popup-content-wrapper { background: #1e1e1e; color: #e0e0e0; }
+.dark-mode .leaflet-popup-tip { background: #1e1e1e; }
 
 /* ===== HERO ===== */
 .hero-section {

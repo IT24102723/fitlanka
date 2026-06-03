@@ -22,7 +22,7 @@ router.post('/register', upload.fields([
   { name: 'certificates', maxCount: 5 }
 ]), async (req, res) => {
   try {
-    const { name, email, password, phone, role, experience, specialties, bio, ratePerMonth, age, gender, fitnessGoals, healthConditions } = req.body;
+    const { name, email, password, phone, role, city, experience, specialties, bio, ratePerMonth, age, gender, fitnessGoals, healthConditions } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -49,6 +49,7 @@ router.post('/register', upload.fields([
       password,
       phone,
       role,
+      city,
       profileImage
     };
 

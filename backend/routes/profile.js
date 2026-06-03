@@ -15,7 +15,7 @@ router.get('/', ensureAuth, async (req, res) => {
 
 router.post('/', ensureAuth, upload.fields([{ name: 'profileImage', maxCount: 1 }]), async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, city } = req.body;
     const userId = req.session.user.id;
     const user = await User.findById(userId);
 
@@ -35,6 +35,7 @@ router.post('/', ensureAuth, upload.fields([{ name: 'profileImage', maxCount: 1 
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
+    if (city) user.city = city;
 
     const photoFile = req.files?.profileImage?.[0];
     if (photoFile) {
