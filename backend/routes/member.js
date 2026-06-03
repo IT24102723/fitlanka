@@ -42,7 +42,6 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
   await member.save();
 
   const fee = coach.coachDetails.ratePerMonth || 2000;
-  const total = fee + WEBSITE_FEE;
 
   let payment = await Payment.findOne({ member: member._id, status: 'pending' });
   if (!payment) {
@@ -51,20 +50,24 @@ router.get('/select-coach/:id', ensureAuth, async (req, res) => {
       coach: coach._id,
       amount: fee,
       websiteFee: WEBSITE_FEE,
-      totalAmount: total,
+      totalAmount: fee + WEBSITE_FEE,
       status: 'pending',
-      paymentMethod: 'manual'
+      paymentMethod: 'manual',
+      membershipDuration: 1
     });
   }
+
+  const durations = [1, 3, 6];
 
   res.render('member/payment', {
     coach,
     member,
     fee,
     websiteFee: WEBSITE_FEE,
-    total,
+    total: payment.totalAmount,
     payment,
     bank: bankDetails,
+    durations,
     messages: req.flash()
   });
 });
@@ -80,11 +83,21 @@ router.get('/cancel', ensureAuth, async (req, res) => {
 
 router.post('/demo-pay/:paymentId', ensureAuth, async (req, res) => {
   try {
-    const payment = await Payment.findById(req.params.paymentId);
+    const payment = await Payment.findById(req.params.paymentId).populate('coach', 'coachDetails');
     if (!payment || payment.member.toString() !== req.session.user.id) {
       return res.json({ success: false, error: 'Invalid payment' });
     }
 
+    const months = parseInt(req.body.membershipDuration) || 1;
+    const fee = payment.coach?.coachDetails?.ratePerMonth || 2000;
+    const total = fee * months + WEBSITE_FEE;
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + months);
+
+    payment.membershipDuration = months;
+    payment.amount = fee;
+    payment.totalAmount = total;
+    payment.expiryDate = expiry;
     payment.status = 'completed';
     payment.paymentMethod = 'demo';
     await payment.save();
@@ -101,13 +114,23 @@ router.post('/demo-pay/:paymentId', ensureAuth, async (req, res) => {
 router.post('/confirm-payment', ensureAuth, async (req, res) => {
   try {
     const { paymentId, manualRef } = req.body;
-    const payment = await Payment.findById(paymentId);
+    const months = parseInt(req.body.membershipDuration) || 1;
+    const payment = await Payment.findById(paymentId).populate('coach', 'coachDetails');
 
     if (!payment || payment.member.toString() !== req.session.user.id) {
       req.flash('error', 'Invalid payment');
       return res.redirect('/member/dashboard');
     }
 
+    const fee = payment.coach?.coachDetails?.ratePerMonth || 2000;
+    const total = fee * months + WEBSITE_FEE;
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + months);
+
+    payment.membershipDuration = months;
+    payment.amount = fee;
+    payment.totalAmount = total;
+    payment.expiryDate = expiry;
     payment.manualRef = manualRef;
     payment.paymentMethod = 'manual';
     payment.notes = 'Awaiting admin confirmation';

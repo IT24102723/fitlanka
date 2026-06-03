@@ -14,6 +14,8 @@ const paymentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   websiteFee: { type: Number, default: 500 },
   totalAmount: { type: Number, required: true },
+  membershipDuration: { type: Number, default: 1 },
+  expiryDate: { type: Date },
   status: {
     type: String,
     enum: ['pending', 'completed', 'failed'],

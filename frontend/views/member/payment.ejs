@@ -42,8 +42,20 @@
             <hr>
             <div class="d-flex justify-content-between fw-bold fs-5">
               <span>Total</span>
-              <span class="text-warning">Rs. <%= total %></span>
+              <span class="text-warning" id="totalAmount">Rs. <%= total %></span>
             </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="fw-medium mb-2">Membership Duration</label>
+            <div class="btn-group w-100" role="group">
+              <% durations.forEach(function(m) { %>
+                <input type="radio" class="btn-check" name="durationRadio" id="dur<%= m %>" value="<%= m %>" <%= m === 1 ? 'checked' : '' %>>
+                <label class="btn btn-outline-warning px-3" for="dur<%= m %>"><%= m %> <%= m === 1 ? 'Month' : 'Months' %></label>
+              <% }) %>
+            </div>
+            <input type="hidden" id="membershipDuration" value="1">
+            <p class="small text-muted mt-1 mb-0">Total = <span id="durMonths">1</span> month(s) &times; Rs. <%= fee %> + Rs. <%= websiteFee %> fee</p>
           </div>
 
           <% if (payment.manualRef) { %>
@@ -138,6 +150,7 @@
                     </table>
                     <form method="post" action="/member/confirm-payment">
                       <input type="hidden" name="paymentId" value="<%= payment._id %>">
+                      <input type="hidden" name="membershipDuration" id="bankDuration" value="1">
                       <input type="text" name="manualRef" class="form-control rounded-3 mb-2" placeholder="Bank Reference" required>
                       <button type="submit" class="btn btn-outline-success w-100 rounded-3">Submit Bank Transfer</button>
                     </form>
@@ -154,6 +167,23 @@
 </div>
 
 <script>
+var feePerMonth = <%= fee %>;
+var websiteFee = <%= websiteFee %>;
+
+function updateTotal() {
+  var dur = parseInt(document.querySelector('input[name="durationRadio"]:checked').value) || 1;
+  var total = feePerMonth * dur + websiteFee;
+  document.getElementById('totalAmount').textContent = 'Rs. ' + total;
+  document.getElementById('membershipDuration').value = dur;
+  document.getElementById('bankDuration').value = dur;
+  document.getElementById('durMonths').textContent = dur;
+  document.getElementById('payBtnText').textContent = 'Pay Rs. ' + total;
+}
+
+document.querySelectorAll('input[name="durationRadio"]').forEach(function(radio) {
+  radio.addEventListener('change', updateTotal);
+});
+
 document.getElementById('cardNumber').addEventListener('input', function(e) {
   let val = this.value.replace(/\D/g, '').substring(0, 16);
   let formatted = val.replace(/(.{4})/g, '$1 ').trim();
@@ -184,6 +214,7 @@ document.getElementById('cardType').addEventListener('input', function() {
 
 document.getElementById('cardPaymentForm').addEventListener('submit', function(e) {
   e.preventDefault();
+  var dur = parseInt(document.querySelector('input[name="durationRadio"]:checked').value) || 1;
   const btn = document.getElementById('payBtn');
   const text = document.getElementById('payBtnText');
   const spinner = document.getElementById('payBtnSpinner');
@@ -191,24 +222,30 @@ document.getElementById('cardPaymentForm').addEventListener('submit', function(e
   text.textContent = 'Processing...';
   spinner.classList.remove('d-none');
 
-  setTimeout(() => {
-    fetch('/member/demo-pay/<%= payment._id %>', { method: 'POST' })
-      .then(r => r.json())
-      .then(data => {
+  setTimeout(function() {
+    fetch('/member/demo-pay/<%= payment._id %>', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'membershipDuration=' + dur
+    })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
         if (data.success) {
           document.getElementById('cardPaymentForm').classList.add('d-none');
           document.getElementById('paymentSuccess').classList.remove('d-none');
         } else {
           alert('Payment failed. Please try again.');
           btn.disabled = false;
-          text.textContent = 'Pay Rs. <%= total %>';
+          var t = feePerMonth * dur + websiteFee;
+          text.textContent = 'Pay Rs. ' + t;
           spinner.classList.add('d-none');
         }
       })
-      .catch(() => {
+      .catch(function() {
         alert('Error processing payment.');
         btn.disabled = false;
-        text.textContent = 'Pay Rs. <%= total %>';
+        var t = feePerMonth * dur + websiteFee;
+        text.textContent = 'Pay Rs. ' + t;
         spinner.classList.add('d-none');
       });
   }, 2000);
