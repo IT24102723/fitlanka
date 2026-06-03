@@ -175,7 +175,7 @@
     maxZoom: 12
   }).addTo(map);
 
-  var coachData = <%= JSON.stringify(coaches.map(c => ({ name: c.name, city: c.city || '', id: c._id.toString() }))) %>;
+  var coachData = <%- JSON.stringify(coaches.map(function(c) { return { name: c.name, city: c.city || '', id: c._id.toString() }; })) %>;
   var grouped = {};
   coachData.forEach(function(c) {
     if (c.city) { if (!grouped[c.city]) grouped[c.city] = []; grouped[c.city].push(c); }
@@ -183,17 +183,30 @@
 
   var allCities = [
     { name: 'Colombo', coord: [6.9271, 79.8612] },
+    { name: 'Gampaha', coord: [7.0915, 79.9990] },
+    { name: 'Kalutara', coord: [6.5854, 79.9607] },
     { name: 'Kandy', coord: [7.2906, 80.6337] },
+    { name: 'Matale', coord: [7.4658, 80.6236] },
+    { name: 'Nuwara Eliya', coord: [6.9707, 80.7829] },
     { name: 'Galle', coord: [6.0535, 80.2210] },
-    { name: 'Jaffna', coord: [9.6615, 80.0255] },
-    { name: 'Negombo', coord: [7.2083, 79.8358] },
-    { name: 'Kurunegala', coord: [7.4867, 80.3646] },
     { name: 'Matara', coord: [5.9549, 80.5549] },
+    { name: 'Hambantota', coord: [6.1245, 81.1175] },
+    { name: 'Jaffna', coord: [9.6615, 80.0255] },
+    { name: 'Kilinochchi', coord: [9.3827, 80.3997] },
+    { name: 'Mannar', coord: [8.9823, 79.9110] },
+    { name: 'Mullaitivu', coord: [9.2701, 80.8131] },
+    { name: 'Vavuniya', coord: [8.7552, 80.4971] },
+    { name: 'Puttalam', coord: [8.0355, 79.8283] },
+    { name: 'Kurunegala', coord: [7.4867, 80.3646] },
     { name: 'Anuradhapura', coord: [8.3114, 80.4037] },
-    { name: 'Ratnapura', coord: [6.7056, 80.3845] },
+    { name: 'Polonnaruwa', coord: [7.9397, 81.0020] },
     { name: 'Badulla', coord: [6.9934, 81.0550] },
+    { name: 'Moneragala', coord: [6.8766, 81.3516] },
+    { name: 'Ratnapura', coord: [6.7056, 80.3845] },
+    { name: 'Kegalle', coord: [7.2513, 80.3477] },
     { name: 'Trincomalee', coord: [8.5874, 81.2152] },
-    { name: 'Batticaloa', coord: [7.7170, 81.7000] }
+    { name: 'Batticaloa', coord: [7.7170, 81.7000] },
+    { name: 'Ampara', coord: [7.2970, 81.6823] }
   ];
 
   var goldIcon = L.divIcon({
