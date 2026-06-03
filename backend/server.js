@@ -41,22 +41,28 @@ app.get('/', async (req, res) => {
   const User = require('./models/User');
   const totalCoaches = await User.countDocuments({ role: 'coach', status: 'approved' });
   const totalMembers = await User.countDocuments({ role: 'member', status: 'approved' });
+  const filterDistrict = req.query.district || '';
   const filterCity = req.query.city || '';
   const coachQuery = { role: 'coach', status: 'approved' };
+  if (filterDistrict) coachQuery.district = filterDistrict;
   if (filterCity) coachQuery.city = filterCity;
   const coaches = await User.find(coachQuery).sort({ createdAt: -1 }).limit(6);
-  const cities = await User.distinct('city', { role: 'coach', status: 'approved', city: { $ne: '' } });
-  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers }, coaches, cities, filterCity });
+  const districts = await User.distinct('district', { role: 'coach', status: 'approved', district: { $ne: '' } });
+  const cities = filterDistrict ? await User.distinct('city', { role: 'coach', status: 'approved', district: filterDistrict, city: { $ne: '' } }) : [];
+  res.render('index', { messages: req.flash(), stats: { coaches: totalCoaches, members: totalMembers }, coaches, districts, cities, filterDistrict, filterCity });
 });
 
 app.get('/coaches', async (req, res) => {
   const User = require('./models/User');
+  const filterDistrict = req.query.district || '';
   const filterCity = req.query.city || '';
   const query = { role: 'coach', status: 'approved' };
+  if (filterDistrict) query.district = filterDistrict;
   if (filterCity) query.city = filterCity;
   const coaches = await User.find(query).sort({ createdAt: -1 });
-  const cities = await User.distinct('city', { role: 'coach', status: 'approved', city: { $ne: '' } });
-  res.render('coaches', { coaches, cities, filterCity, messages: req.flash() });
+  const districts = await User.distinct('district', { role: 'coach', status: 'approved', district: { $ne: '' } });
+  const cities = filterDistrict ? await User.distinct('city', { role: 'coach', status: 'approved', district: filterDistrict, city: { $ne: '' } }) : [];
+  res.render('coaches', { coaches, districts, cities, filterDistrict, filterCity, messages: req.flash() });
 });
 
 app.get('/coach-profile/:id', async (req, res) => {

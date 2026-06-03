@@ -145,20 +145,28 @@
       <p class="text-muted">Select a city to find coaches near you</p>
     </div>
     <div class="row justify-content-center mb-4">
-      <div class="col-md-6">
-        <form method="GET" action="/" id="cityFilterForm">
-          <div class="input-group">
-            <span class="input-group-text bg-warning text-dark"><i class="bi bi-geo-alt"></i></span>
-            <select name="city" class="form-select" onchange="this.form.submit()">
-              <option value="">All Cities</option>
-              <% if (typeof cities !== 'undefined' && cities.length) { %>
-                <% cities.forEach(c => { %>
-                  <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
-                <% }) %>
-              <% } %>
-            </select>
-          </div>
-        </form>
+      <div class="col-auto">
+        <select class="form-select" id="homeFilterDistrict" onchange="filterHome()">
+          <option value="">All Districts</option>
+          <% if (typeof districts !== 'undefined' && districts.length) { %>
+            <% districts.forEach(d => { %>
+              <option value="<%= d %>" <%= filterDistrict === d ? 'selected' : '' %>><%= d %></option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+      <div class="col-auto">
+        <select class="form-select" id="homeFilterCity" <%= filterDistrict ? '' : 'disabled' %>>
+          <option value="">All Cities</option>
+          <% if (typeof cities !== 'undefined' && cities.length) { %>
+            <% cities.forEach(c => { %>
+              <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-warning rounded-3 px-4" onclick="filterHome()"><i class="bi bi-search"></i> Search</button>
       </div>
     </div>
     <div id="map" style="height:400px;border-radius:16px;overflow:hidden;" class="shadow"></div>
@@ -175,39 +183,27 @@
     maxZoom: 12
   }).addTo(map);
 
-  var coachData = <%- JSON.stringify(coaches.map(function(c) { return { name: c.name, city: c.city || '', id: c._id.toString() }; })) %>;
+  var coachData = <%- JSON.stringify(coaches.map(function(c) { return { name: c.name, district: c.district || '', city: c.city || '', id: c._id.toString() }; })) %>;
   var grouped = {};
   coachData.forEach(function(c) {
-    if (c.city) { if (!grouped[c.city]) grouped[c.city] = []; grouped[c.city].push(c); }
+    if (c.district) {
+      if (!grouped[c.district]) grouped[c.district] = {};
+      if (!grouped[c.district][c.city]) grouped[c.district][c.city] = [];
+      grouped[c.district][c.city].push(c);
+    }
   });
 
-  var allCities = [
-    { name: 'Colombo', coord: [6.9271, 79.8612] },
-    { name: 'Gampaha', coord: [7.0915, 79.9990] },
-    { name: 'Kalutara', coord: [6.5854, 79.9607] },
-    { name: 'Kandy', coord: [7.2906, 80.6337] },
-    { name: 'Matale', coord: [7.4658, 80.6236] },
-    { name: 'Nuwara Eliya', coord: [6.9707, 80.7829] },
-    { name: 'Galle', coord: [6.0535, 80.2210] },
-    { name: 'Matara', coord: [5.9549, 80.5549] },
-    { name: 'Hambantota', coord: [6.1245, 81.1175] },
-    { name: 'Jaffna', coord: [9.6615, 80.0255] },
-    { name: 'Kilinochchi', coord: [9.3827, 80.3997] },
-    { name: 'Mannar', coord: [8.9823, 79.9110] },
-    { name: 'Mullaitivu', coord: [9.2701, 80.8131] },
-    { name: 'Vavuniya', coord: [8.7552, 80.4971] },
-    { name: 'Puttalam', coord: [8.0355, 79.8283] },
-    { name: 'Kurunegala', coord: [7.4867, 80.3646] },
-    { name: 'Anuradhapura', coord: [8.3114, 80.4037] },
-    { name: 'Polonnaruwa', coord: [7.9397, 81.0020] },
-    { name: 'Badulla', coord: [6.9934, 81.0550] },
-    { name: 'Moneragala', coord: [6.8766, 81.3516] },
-    { name: 'Ratnapura', coord: [6.7056, 80.3845] },
-    { name: 'Kegalle', coord: [7.2513, 80.3477] },
-    { name: 'Trincomalee', coord: [8.5874, 81.2152] },
-    { name: 'Batticaloa', coord: [7.7170, 81.7000] },
-    { name: 'Ampara', coord: [7.2970, 81.6823] }
-  ];
+  var districtCoords = {
+    'Colombo': [6.9271, 79.8612], 'Gampaha': [7.0915, 79.9990], 'Kalutara': [6.5854, 79.9607],
+    'Kandy': [7.2906, 80.6337], 'Matale': [7.4658, 80.6236], 'Nuwara Eliya': [6.9707, 80.7829],
+    'Galle': [6.0535, 80.2210], 'Matara': [5.9549, 80.5549], 'Hambantota': [6.1245, 81.1175],
+    'Jaffna': [9.6615, 80.0255], 'Kilinochchi': [9.3827, 80.3997], 'Mannar': [8.9823, 79.9110],
+    'Mullaitivu': [9.2701, 80.8131], 'Vavuniya': [8.7552, 80.4971], 'Puttalam': [8.0355, 79.8283],
+    'Kurunegala': [7.4867, 80.3646], 'Anuradhapura': [8.3114, 80.4037], 'Polonnaruwa': [7.9397, 81.0020],
+    'Badulla': [6.9934, 81.0550], 'Moneragala': [6.8766, 81.3516], 'Ratnapura': [6.7056, 80.3845],
+    'Kegalle': [7.2513, 80.3477], 'Trincomalee': [8.5874, 81.2152], 'Batticaloa': [7.7170, 81.7000],
+    'Ampara': [7.2970, 81.6823]
+  };
 
   var goldIcon = L.divIcon({
     className: 'custom-marker',
@@ -225,18 +221,30 @@
     popupAnchor: [0, -24]
   });
 
-  allCities.forEach(function(city) {
-    var coaches = grouped[city.name] || [];
-    var hasCoaches = coaches.length > 0;
-    var icon = hasCoaches ? goldIcon : grayIcon;
-    var names = hasCoaches
-      ? coaches.map(function(c) { return '<a href="/coach-profile/' + c.id + '" class="text-decoration-none fw-medium">\uD83D\uDCAA ' + c.name + '</a>'; }).join('<br>')
-      : '<span class="text-muted">No coaches yet</span>';
-    var popupHtml = '<div style="min-width:150px;">' +
-      '<h6 style="margin:0 0 6px;font-weight:700;"><span style="background:#ffc107;padding:2px 10px;border-radius:10px;">' + city.name + '</span></h6>' +
-      '<div style="font-size:13px;">' + names + '</div>' +
-      '</div>';
-    var marker = L.marker(city.coord, { icon: icon }).addTo(map);
+  allDistricts.forEach(function(district) {
+    var coord = districtCoords[district];
+    if (!coord) return;
+    var cities = grouped[district] || {};
+    var cityKeys = Object.keys(cities);
+    var totalCoachCount = 0;
+    cityKeys.forEach(function(k) { totalCoachCount += cities[k].length; });
+    var icon = totalCoachCount > 0 ? goldIcon : grayIcon;
+    var popupHtml = '<div style="min-width:180px;">' +
+      '<h6 style="margin:0 0 6px;font-weight:700;"><span style="background:#ffc107;padding:2px 10px;border-radius:10px;">' + district + '</span></h6>' +
+      '<div style="font-size:13px;max-height:200px;overflow-y:auto;">';
+    if (totalCoachCount > 0) {
+      cityKeys.forEach(function(city) {
+        popupHtml += '<div style="margin:4px 0;"><strong>' + city + '</strong><br>';
+        popupHtml += cities[city].map(function(c) {
+          return '<a href="/coach-profile/' + c.id + '" class="text-decoration-none">\uD83D\uDCAA ' + c.name + '</a>';
+        }).join('<br>');
+        popupHtml += '</div>';
+      });
+    } else {
+      popupHtml += '<span class="text-muted">No coaches in this district yet</span>';
+    }
+    popupHtml += '</div></div>';
+    var marker = L.marker(coord, { icon: icon }).addTo(map);
     marker.bindPopup(popupHtml, { closeButton: false, offset: [0, -16] });
     marker.on('mouseover', function() { this.openPopup(); });
     marker.on('mouseout', function() { this.closePopup(); });
@@ -260,7 +268,7 @@
               <img src="<%= c.profileImage || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=400&h=300&fit=crop' %>" alt="<%= c.name %>" class="card-img-top" style="height:200px;object-fit:cover;">
               <div class="card-body text-center p-4">
                 <h5 class="fw-bold"><%= c.name %></h5>
-                <p class="text-muted small"><i class="bi bi-geo-alt me-1"></i> <%= c.city || 'Sri Lanka' %></p>
+                <p class="text-muted small"><i class="bi bi-geo-alt me-1"></i> <%= [c.city, c.district].filter(Boolean).join(', ') || 'Sri Lanka' %></p>
                 <p class="text-muted small"><%= (c.coachDetails?.specialties || []).slice(0, 3).join(', ') || 'Fitness Coach' %></p>
                 <p class="small mb-2"><i class="bi bi-star-fill text-warning me-1"></i> Rs.<%= c.coachDetails?.ratePerMonth || 2000 %>/month</p>
                 <a href="/coach-profile/<%= c._id %>" class="btn btn-outline-warning rounded-pill px-4">View Profile</a>
@@ -477,6 +485,27 @@ document.getElementById('feedbackForm').addEventListener('submit', function(e) {
 });
 
 loadFeedback();
+
+function filterHome() {
+  var d = document.getElementById('homeFilterDistrict').value;
+  var c = document.getElementById('homeFilterCity').value;
+  var params = [];
+  if (d) params.push('district=' + encodeURIComponent(d));
+  if (c) params.push('city=' + encodeURIComponent(c));
+  window.location = '/?' + params.join('&');
+}
+document.getElementById('homeFilterDistrict').addEventListener('change', function() {
+  var d = this.value;
+  var cs = document.getElementById('homeFilterCity');
+  if (d && districtCities[d]) {
+    cs.innerHTML = '<option value="">All Cities</option>';
+    districtCities[d].forEach(function(c) { cs.innerHTML += '<option value="' + c + '">' + c + '</option>'; });
+    cs.disabled = false;
+  } else {
+    cs.innerHTML = '<option value="">All Cities</option>';
+    cs.disabled = true;
+  }
+});
 </script>
 
 <!-- ===== CTA ===== -->

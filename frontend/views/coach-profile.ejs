@@ -23,7 +23,7 @@
         <hr>
         <p class="mb-1 small"><i class="bi bi-envelope text-warning me-1"></i> <%= coach.email %></p>
         <p class="mb-1 small"><i class="bi bi-telephone text-warning me-1"></i> <%= coach.phone %></p>
-        <p class="mb-0 small"><i class="bi bi-geo-alt text-warning me-1"></i> <%= coach.city || 'Sri Lanka' %></p>
+        <p class="mb-0 small"><i class="bi bi-geo-alt text-warning me-1"></i> <%= [coach.city, coach.district].filter(Boolean).join(', ') || 'Sri Lanka' %></p>
 
         <hr>
         <% if (!user) { %>

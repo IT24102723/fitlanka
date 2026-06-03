@@ -7,20 +7,28 @@
   </div>
 
   <div class="row justify-content-center mb-4">
-    <div class="col-md-6">
-      <form method="GET" action="/coaches">
-        <div class="input-group">
-          <span class="input-group-text bg-warning text-dark"><i class="bi bi-geo-alt"></i></span>
-          <select name="city" class="form-select" onchange="this.form.submit()">
-            <option value="">All Cities</option>
-            <% if (typeof cities !== 'undefined' && cities.length) { %>
-              <% cities.forEach(c => { %>
-                <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
-              <% }) %>
-            <% } %>
-          </select>
-        </div>
-      </form>
+    <div class="col-md-3">
+      <select class="form-select" id="coachFilterDistrict" onchange="filterCoaches()">
+        <option value="">All Districts</option>
+        <% if (typeof districts !== 'undefined' && districts.length) { %>
+          <% districts.forEach(d => { %>
+            <option value="<%= d %>" <%= filterDistrict === d ? 'selected' : '' %>><%= d %></option>
+          <% }) %>
+        <% } %>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" id="coachFilterCity" <%= filterDistrict ? '' : 'disabled' %>>
+        <option value="">All Cities</option>
+        <% if (typeof cities !== 'undefined' && cities.length) { %>
+          <% cities.forEach(c => { %>
+            <option value="<%= c %>" <%= filterCity === c ? 'selected' : '' %>><%= c %></option>
+          <% }) %>
+        <% } %>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-warning rounded-3 px-4" onclick="filterCoaches()"><i class="bi bi-search"></i> Search</button>
     </div>
   </div>
 
@@ -38,7 +46,7 @@
             <span class="badge bg-warning text-dark mb-2">Rs.<%= c.coachDetails?.ratePerMonth || 2000 %> / month</span>
             <hr>
             <div class="text-start small">
-              <p class="mb-1"><i class="bi bi-geo-alt text-warning me-1"></i> <%= c.city || 'Sri Lanka' %></p>
+              <p class="mb-1"><i class="bi bi-geo-alt text-warning me-1"></i> <%= [c.city, c.district].filter(Boolean).join(', ') || 'Sri Lanka' %></p>
               <p class="mb-1"><i class="bi bi-clock-history text-warning me-1"></i> <%= c.coachDetails?.experience || '0' %> years exp</p>
               <p class="mb-1"><i class="bi bi-star text-warning me-1"></i> <%= (c.coachDetails?.specialties || []).join(', ') || 'General' %></p>
               <p class="text-muted mt-2 mb-0"><%= (c.coachDetails?.bio || '').substring(0, 100) %></p>
@@ -61,4 +69,26 @@
   </div>
 </div>
 
+<script>
+function filterCoaches() {
+  var d = document.getElementById('coachFilterDistrict').value;
+  var c = document.getElementById('coachFilterCity').value;
+  var params = [];
+  if (d) params.push('district=' + encodeURIComponent(d));
+  if (c) params.push('city=' + encodeURIComponent(c));
+  window.location = '/coaches' + (params.length ? '?' + params.join('&') : '');
+}
+document.getElementById('coachFilterDistrict').addEventListener('change', function() {
+  var d = this.value;
+  var cs = document.getElementById('coachFilterCity');
+  if (d && districtCities[d]) {
+    cs.innerHTML = '<option value="">All Cities</option>';
+    districtCities[d].forEach(function(c) { cs.innerHTML += '<option value="' + c + '">' + c + '</option>'; });
+    cs.disabled = false;
+  } else {
+    cs.innerHTML = '<option value="">All Cities</option>';
+    cs.disabled = true;
+  }
+});
+</script>
 <%- include('partials/footer') %>

@@ -47,12 +47,15 @@
                 <input type="text" name="phone" class="form-control" value="<%= user.phone %>" required>
               </div>
               <div class="col-md-6 mb-3">
-                <label class="form-label fw-medium small">City</label>
-                <select name="city" class="form-select">
+                <label class="form-label fw-medium small">District</label>
+                <select name="district" class="form-select" id="profDistrict" onchange="updateCityDropdown('profDistrict','profCity','')">
                   <option value="">Select your district</option>
-                  <% ['Colombo','Gampaha','Kalutara','Kandy','Matale','Nuwara Eliya','Galle','Matara','Hambantota','Jaffna','Kilinochchi','Mannar','Mullaitivu','Vavuniya','Puttalam','Kurunegala','Anuradhapura','Polonnaruwa','Badulla','Moneragala','Ratnapura','Kegalle','Trincomalee','Batticaloa','Ampara'].forEach(c => { %>
-                    <option value="<%= c %>" <%= user.city === c ? 'selected' : '' %>><%= c %></option>
-                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-medium small">City</label>
+                <select name="city" class="form-select" id="profCity">
+                  <option value="">First select a district</option>
                 </select>
               </div>
               <div class="col-md-6 mb-3">
@@ -75,6 +78,11 @@
 </div>
 
 <script>
+(function() {
+  var ds = document.getElementById('profDistrict');
+  allDistricts.forEach(function(d) { ds.innerHTML += '<option value="' + d + '"' + ('<%- user.district %>' === d ? ' selected' : '') + '>' + d + '</option>'; });
+  if ('<%- user.district %>') { updateCityDropdown('profDistrict', 'profCity', '<%- user.city %>'); }
+})();
 function previewProfilePic(e) {
   const file = e.target.files[0];
   if (!file) return;
