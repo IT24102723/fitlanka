@@ -35,13 +35,13 @@ router.get('/users/add', (req, res) => {
 
 router.post('/users/add', async (req, res) => {
   try {
-    const { name, email, phone, password, role, status, experience, specialties, ratePerMonth, bio, age, gender, fitnessGoals, healthConditions } = req.body;
+    const { name, email, phone, password, role, status, district, city, profileImage, experience, specialties, ratePerMonth, bio, age, gender, fitnessGoals, healthConditions } = req.body;
     const exists = await User.findOne({ email });
     if (exists) {
       req.flash('error', 'Email already registered');
       return res.redirect('back');
     }
-    const userData = { name, email, phone, password, role, status: status || 'approved' };
+    const userData = { name, email, phone, password, role, status: status || 'approved', district: district || '', city: city || '', profileImage: profileImage || '' };
     if (role === 'coach') {
       userData.coachDetails = {
         experience: experience || '',
@@ -72,12 +72,15 @@ router.get('/users/edit/:id', async (req, res) => {
 
 router.post('/users/edit/:id', async (req, res) => {
   try {
-    const { name, email, phone, password, status, experience, specialties, ratePerMonth, bio, age, gender, fitnessGoals, healthConditions } = req.body;
+    const { name, email, phone, password, status, district, city, profileImage, experience, specialties, ratePerMonth, bio, age, gender, fitnessGoals, healthConditions } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) { req.flash('error', 'User not found'); return res.redirect('/admin/dashboard'); }
     user.name = name || user.name;
     user.email = email || user.email;
     user.phone = phone || user.phone;
+    user.district = district || user.district;
+    user.city = city || user.city;
+    if (profileImage) user.profileImage = profileImage;
     if (password) user.password = password;
     if (status) user.status = status;
     if (user.role === 'coach') {

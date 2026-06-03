@@ -129,6 +129,9 @@
                 <span id="payBtnText">Pay Rs. <%= total %></span>
                 <span id="payBtnSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
               </button>
+              <div class="text-center mt-2">
+                <a href="/member/cancel" class="btn btn-sm btn-outline-secondary rounded-pill px-4" onclick="return confirm('Cancel payment?')"><i class="bi bi-x-circle me-1"></i> Cancel</a>
+              </div>
             </form>
 
             <hr class="my-3">

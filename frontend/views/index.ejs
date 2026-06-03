@@ -204,10 +204,16 @@
   var coachData = <%- JSON.stringify(coaches.map(function(c) { return { name: c.name, district: c.district || '', city: c.city || '', id: c._id.toString() }; })) %>;
   var grouped = {};
   coachData.forEach(function(c) {
-    if (c.district) {
-      if (!grouped[c.district]) grouped[c.district] = {};
-      if (!grouped[c.district][c.city]) grouped[c.district][c.city] = [];
-      grouped[c.district][c.city].push(c);
+    var d = c.district;
+    if (!d && c.city && typeof districtCities !== 'undefined') {
+      for (var key in districtCities) {
+        if (districtCities[key].indexOf(c.city) !== -1) { d = key; break; }
+      }
+    }
+    if (d) {
+      if (!grouped[d]) grouped[d] = {};
+      if (!grouped[d][c.city]) grouped[d][c.city] = [];
+      grouped[d][c.city].push(c);
     }
   });
 
