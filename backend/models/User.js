@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   profileImage: { type: String, default: '' },
   role: {
     type: String,
-    enum: ['admin', 'coach', 'member'],
+    enum: ['admin', 'coach', 'member', 'gymOwner'],
     default: 'member'
   },
   status: {
@@ -25,13 +25,25 @@ const userSchema = new mongoose.Schema({
     specialties: [{ type: String }],
     bio: { type: String },
     profileImage: { type: String, default: '' },
-    ratePerMonth: { type: Number }
+    ratePerMonth: { type: Number },
+    gender: { type: String, default: '' },
+    customerProgress: [{
+      memberName: { type: String },
+      photos: [{ url: String, caption: String, date: { type: Date, default: Date.now } }],
+      notes: { type: String },
+      createdAt: { type: Date, default: Date.now }
+    }]
   },
   memberDetails: {
     age: Number,
     gender: String,
     fitnessGoals: String,
     healthConditions: String
+  },
+  gymOwnerDetails: {
+    gymName: { type: String, default: '' },
+    gymAddress: { type: String, default: '' },
+    gymPhotos: [{ type: String }]
   },
   selectedCoach: {
     type: mongoose.Schema.Types.ObjectId,

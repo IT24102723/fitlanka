@@ -84,6 +84,7 @@ app.get('/coach-profile/:id/members-count', async (req, res) => {
 app.use('/', require('./routes/auth'));
 app.use('/admin', require('./routes/admin'));
 app.use('/coach', require('./routes/coach'));
+app.use('/gym', require('./routes/coach'));
 app.use('/member', require('./routes/member'));
 app.use('/payment', require('./routes/payment'));
 app.use('/feedback', require('./routes/feedback'));

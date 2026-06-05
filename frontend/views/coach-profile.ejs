@@ -101,6 +101,38 @@
           <% } %>
         </div>
       </div>
+
+      <!-- Progress Gallery -->
+      <% if (coach.coachDetails?.customerProgress && coach.coachDetails.customerProgress.length > 0) { %>
+      <div class="card shadow border-0 rounded-4 mt-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow text-warning me-2"></i> Client Progress Gallery</h4>
+          <% coach.coachDetails.customerProgress.forEach(function(entry) { %>
+            <div class="mb-4">
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-person-circle text-warning me-2"></i>
+                <h6 class="fw-bold mb-0"><%= entry.memberName || 'Client' %></h6>
+                <small class="text-muted ms-2"><%= new Date(entry.createdAt).toLocaleDateString() %></small>
+              </div>
+              <% if (entry.photos && entry.photos.length > 0) { %>
+                <div class="row g-2">
+                  <% entry.photos.forEach(function(photo) { %>
+                    <div class="col-4 col-md-3">
+                      <a href="<%= photo.url %>" target="_blank">
+                        <img src="<%= photo.url %>" alt="<%= photo.caption || 'Progress' %>" class="img-fluid rounded-3 shadow-sm" style="height:120px;width:100%;object-fit:cover;">
+                      </a>
+                      <% if (photo.caption) { %><small class="d-block text-muted mt-1"><%= photo.caption %></small><% } %>
+                    </div>
+                  <% }) %>
+                </div>
+              <% } %>
+              <% if (entry.notes) { %><p class="text-muted small mt-1 mb-0"><i class="bi bi-chat-quote me-1"></i> <%= entry.notes %></p><% } %>
+              <hr class="my-2">
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
     </div>
   </div>
 </div>

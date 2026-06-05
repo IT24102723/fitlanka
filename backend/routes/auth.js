@@ -19,10 +19,11 @@ router.get('/register', (req, res) => {
 
 router.post('/register', upload.fields([
   { name: 'profileImage', maxCount: 1 },
-  { name: 'certificates', maxCount: 5 }
+  { name: 'certificates', maxCount: 5 },
+  { name: 'gymPhotos', maxCount: 5 }
 ]), async (req, res) => {
   try {
-    const { name, email, password, phone, role, district, city, experience, specialties, bio, ratePerMonth, age, gender, fitnessGoals, healthConditions } = req.body;
+    const { name, email, password, phone, role, district, city, experience, specialties, bio, ratePerMonth, age, gender, fitnessGoals, healthConditions, gymName, gymAddress } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -32,6 +33,11 @@ router.post('/register', upload.fields([
 
     const certFiles = req.files?.certificates || [];
     const photoFile = req.files?.profileImage?.[0];
+    const gymPhotoFiles = req.files?.gymPhotos || [];
+
+    function bufferToBase64(file) {
+      return 'data:' + file.mimetype + ';base64,' + file.buffer.toString('base64');
+    }
 
     let profileImage = '';
     if (photoFile) {
@@ -39,7 +45,7 @@ router.post('/register', upload.fields([
         try { profileImage = await uploadImage(photoFile.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
       }
       if (!profileImage) {
-        profileImage = 'data:' + photoFile.mimetype + ';base64,' + photoFile.buffer.toString('base64');
+        profileImage = bufferToBase64(photoFile);
       }
     }
 
@@ -61,8 +67,22 @@ router.post('/register', upload.fields([
         experience,
         specialties: specialties ? (Array.isArray(specialties) ? specialties : [specialties]) : [],
         bio,
+        gender: gender || '',
         ratePerMonth: Number(ratePerMonth) || 0
       };
+    }
+
+    if (role === 'gymOwner') {
+      let gymPhotos = [];
+      for (const f of gymPhotoFiles) {
+        let url = '';
+        if (uploadImage) {
+          try { url = await uploadImage(f.buffer); } catch (e) { console.error('Cloudinary error:', e.message); }
+        }
+        if (!url) url = bufferToBase64(f);
+        gymPhotos.push(url);
+      }
+      userData.gymOwnerDetails = { gymName, gymAddress, gymPhotos };
     }
 
     if (role === 'member') {
@@ -102,6 +122,7 @@ router.post('/login', async (req, res) => {
 
     if (user.role === 'admin') return res.redirect('/admin/dashboard');
     if (user.role === 'coach') return res.redirect('/coach/dashboard');
+    if (user.role === 'gymOwner') return res.redirect('/coach/dashboard');
     if (user.role === 'member') return res.redirect('/member/dashboard');
   } catch (err) {
     console.error(err);

@@ -3,7 +3,7 @@
 <div class="container py-4">
   <div class="text-center mb-4">
     <h2 class="fw-bold display-6">Join <span class="text-warning">FitLanka</span></h2>
-    <p class="text-muted">Create your account and start your fitness journey</p>
+    <p class="text-muted">Register as a Coach, Gym Owner or Client</p>
   </div>
   <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -11,8 +11,8 @@
         <div class="col-md-5 d-none d-md-flex flex-column" style="background:url('https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=800&fit=crop') center center / cover no-repeat;">
           <div class="p-5 d-flex flex-column justify-content-center h-100" style="background:linear-gradient(135deg,rgba(15,12,41,0.85),rgba(48,43,99,0.7));">
             <h2 class="text-white fw-bold display-6">Start Your Journey</h2>
-            <p class="text-white-50 mb-4">Join hundreds of Sri Lankans transforming their lives with certified fitness coaches.</p>
-            <div class="text-white mb-2"><i class="bi bi-person-check-fill text-warning me-2"></i> Register as Coach or Member</div>
+            <p class="text-white-50 mb-4">Join Sri Lanka's fitness community. Whether you're a coach, gym owner, or client — we've got you covered.</p>
+            <div class="text-white mb-2"><i class="bi bi-person-check-fill text-warning me-2"></i> Register as Coach, Gym Owner or Client</div>
             <div class="text-white mb-2"><i class="bi bi-shield-check text-warning me-2"></i> Verified by Admin</div>
             <div class="text-white"><i class="bi bi-credit-card text-warning me-2"></i> Pay in LKR via PayHere</div>
           </div>
@@ -21,9 +21,11 @@
           <div class="d-flex justify-content-center mb-3">
             <div class="btn-group rounded-pill overflow-hidden shadow-sm" role="group">
               <input type="radio" class="btn-check" name="roleRadio" id="roleCoach" value="coach" checked>
-              <label class="btn btn-outline-warning px-4 py-2 fw-bold" for="roleCoach"><i class="bi bi-person-badge"></i> Coach</label>
+              <label class="btn btn-outline-warning px-3 py-2 fw-bold" for="roleCoach"><i class="bi bi-person-badge"></i> Coach</label>
+              <input type="radio" class="btn-check" name="roleRadio" id="roleGym" value="gymOwner">
+              <label class="btn btn-outline-warning px-3 py-2 fw-bold" for="roleGym"><i class="bi bi-building"></i> Gym Owner</label>
               <input type="radio" class="btn-check" name="roleRadio" id="roleMember" value="member">
-              <label class="btn btn-outline-warning px-4 py-2 fw-bold" for="roleMember"><i class="bi bi-person"></i> Member</label>
+              <label class="btn btn-outline-warning px-3 py-2 fw-bold" for="roleMember"><i class="bi bi-person"></i> Client</label>
             </div>
           </div>
 
@@ -69,6 +71,7 @@
               </div>
             </div>
 
+            <!-- Coach Fields -->
             <div id="coachFields">
               <hr class="my-2">
               <div class="d-flex align-items-center mb-2">
@@ -77,6 +80,14 @@
               </div>
               <div class="row">
                 <div class="col-md-4 mb-2">
+                  <label class="form-label fw-medium small">Gender</label>
+                  <select name="gender" class="form-select form-select-sm">
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2">
                   <label class="form-label fw-medium small">Experience (years)</label>
                   <input type="number" name="experience" class="form-control form-control-sm" placeholder="e.g. 5">
                 </div>
@@ -84,30 +95,61 @@
                   <label class="form-label fw-medium small">Monthly Rate (LKR)</label>
                   <input type="number" name="ratePerMonth" class="form-control form-control-sm" placeholder="e.g. 5000">
                 </div>
-                <div class="col-md-4 mb-2">
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-2">
                   <label class="form-label fw-medium small">Specialties</label>
                   <input type="text" name="specialties" class="form-control form-control-sm" placeholder="e.g. Yoga, Cardio">
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label fw-medium small">Profile Photo</label>
+                  <input type="file" name="profileImage" class="form-control form-control-sm" accept=".jpg,.jpeg,.png">
                 </div>
               </div>
               <div class="mb-2">
                 <label class="form-label fw-medium small">Bio</label>
-                <textarea name="bio" class="form-control form-control-sm" rows="2" placeholder="Tell members about your coaching style..."></textarea>
+                <textarea name="bio" class="form-control form-control-sm" rows="2" placeholder="Tell clients about your coaching style..."></textarea>
               </div>
               <div class="mb-2">
+                <label class="form-label fw-medium small">Certificates</label>
+                <input type="file" name="certificates" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png,.pdf">
+              </div>
+            </div>
+
+            <!-- Gym Owner Fields -->
+            <div id="gymFields" style="display:none;">
+              <hr class="my-2">
+              <div class="d-flex align-items-center mb-2">
+                <div class="bg-info bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-building text-info"></i></div>
+                <h6 class="fw-bold mb-0">Gym Details</h6>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label fw-medium small">Gym Name</label>
+                  <input type="text" name="gymName" class="form-control form-control-sm" placeholder="Your gym name">
+                </div>
+                <div class="col-md-6 mb-2">
                   <label class="form-label fw-medium small">Profile Photo</label>
                   <input type="file" name="profileImage" class="form-control form-control-sm" accept=".jpg,.jpeg,.png">
                 </div>
-                <div class="mb-2">
-                  <label class="form-label fw-medium small">Certificates</label>
-                  <input type="file" name="certificates" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png,.pdf">
-                </div>
               </div>
+              <div class="mb-2">
+                <label class="form-label fw-medium small">Gym Address</label>
+                <textarea name="gymAddress" class="form-control form-control-sm" rows="2" placeholder="Full gym address..."></textarea>
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-medium small">Gym Photos</label>
+                <input type="file" name="gymPhotos" class="form-control form-control-sm" multiple accept=".jpg,.jpeg,.png">
+                <small class="text-muted">Upload photos of your gym facility</small>
+              </div>
+            </div>
 
+            <!-- Client Fields (formerly Member) -->
             <div id="memberFields" style="display:none;">
               <hr class="my-2">
               <div class="d-flex align-items-center mb-2">
                 <div class="bg-success bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-person-fill text-success"></i></div>
-                <h6 class="fw-bold mb-0">Member Details</h6>
+                <h6 class="fw-bold mb-0">Client Details</h6>
               </div>
               <div class="row">
                 <div class="col-md-4 mb-2">
@@ -128,14 +170,14 @@
                 </div>
               </div>
               <div class="mb-2">
-                  <label class="form-label fw-medium small">Health Conditions</label>
-                  <textarea name="healthConditions" class="form-control form-control-sm" rows="1" placeholder="e.g. Asthma, none"></textarea>
-                </div>
-                <div class="mb-2">
-                  <label class="form-label fw-medium small">Profile Photo</label>
-                  <input type="file" name="profileImage" class="form-control form-control-sm" accept=".jpg,.jpeg,.png">
-                </div>
+                <label class="form-label fw-medium small">Health Conditions</label>
+                <textarea name="healthConditions" class="form-control form-control-sm" rows="1" placeholder="e.g. Asthma, none"></textarea>
               </div>
+              <div class="mb-2">
+                <label class="form-label fw-medium small">Profile Photo</label>
+                <input type="file" name="profileImage" class="form-control form-control-sm" accept=".jpg,.jpeg,.png">
+              </div>
+            </div>
 
             <button type="submit" class="btn btn-warning w-100 fw-bold rounded-3 mt-2">Create Account <i class="bi bi-arrow-right ms-2"></i></button>
           </form>
@@ -148,11 +190,15 @@
 </div>
 
 <script>
-document.querySelectorAll('input[name="roleRadio"]').forEach(radio => {
+function toggleRole(role) {
+  document.getElementById('coachFields').style.display = role === 'coach' ? 'block' : 'none';
+  document.getElementById('gymFields').style.display = role === 'gymOwner' ? 'block' : 'none';
+  document.getElementById('memberFields').style.display = role === 'member' ? 'block' : 'none';
+}
+document.querySelectorAll('input[name="roleRadio"]').forEach(function(radio) {
   radio.addEventListener('change', function() {
     document.getElementById('roleInput').value = this.value;
-    document.getElementById('coachFields').style.display = this.value === 'coach' ? 'block' : 'none';
-    document.getElementById('memberFields').style.display = this.value === 'member' ? 'block' : 'none';
+    toggleRole(this.value);
   });
 });
 (function() {

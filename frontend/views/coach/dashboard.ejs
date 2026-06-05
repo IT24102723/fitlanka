@@ -47,7 +47,7 @@
       </div>
     </div>
     <div class="col-md-8">
-      <div class="card shadow border-0 rounded-4">
+      <div class="card shadow border-0 rounded-4 mb-4">
         <div class="card-body p-4">
           <div class="d-flex align-items-center mb-3">
             <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-people-fill text-warning fs-4"></i></div>
@@ -56,7 +56,7 @@
           <div class="table-responsive">
             <table class="table table-hover align-middle">
               <thead>
-                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Since</th></tr>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Since</th><th>Action</th></tr>
               </thead>
               <tbody>
                 <% members.forEach(m => { %>
@@ -65,18 +65,124 @@
                     <td><%= m.member?.email || 'N/A' %></td>
                     <td><%= m.member?.phone || 'N/A' %></td>
                     <td><%= new Date(m.createdAt).toLocaleDateString() %></td>
+                    <td><button class="btn btn-sm btn-outline-warning add-progress" data-member="<%= m.member?.name || 'Client' %>" data-coach="<%= coach._id %>"><i class="bi bi-camera"></i> Progress</button></td>
                   </tr>
                 <% }) %>
                 <% if (members.length === 0) { %>
-                  <tr><td colspan="4" class="text-center text-muted py-4"><i class="bi bi-people"></i> No members yet</td></tr>
+                  <tr><td colspan="5" class="text-center text-muted py-4"><i class="bi bi-people"></i> No members yet</td></tr>
                 <% } %>
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <!-- Customer Progress -->
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-2"><i class="bi bi-graph-up-arrow text-warning fs-4"></i></div>
+            <h5 class="fw-bold mb-0">Client Progress Photos</h5>
+          </div>
+
+          <div class="row g-3" id="progressEntries">
+            <% if (coach.coachDetails?.customerProgress && coach.coachDetails.customerProgress.length > 0) { %>
+              <% coach.coachDetails.customerProgress.forEach(function(entry, idx) { %>
+                <div class="col-12">
+                  <div class="border rounded-3 p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="fw-bold mb-0"><i class="bi bi-person-circle text-warning me-1"></i> <%= entry.memberName || 'Client' %></h6>
+                      <small class="text-muted"><%= new Date(entry.createdAt).toLocaleDateString() %></small>
+                    </div>
+                    <% if (entry.photos && entry.photos.length > 0) { %>
+                      <div class="row g-2 mb-2">
+                        <% entry.photos.forEach(function(photo) { %>
+                          <div class="col-3">
+                            <img src="<%= photo.url %>" class="img-fluid rounded-2 shadow-sm" style="height:80px;width:100%;object-fit:cover;">
+                            <% if (photo.caption) { %><small class="d-block text-muted"><%= photo.caption %></small><% } %>
+                          </div>
+                        <% }) %>
+                      </div>
+                    <% } %>
+                    <% if (entry.notes) { %><p class="text-muted small mb-0"><i class="bi bi-chat-quote me-1"></i> <%= entry.notes %></p><% } %>
+                  </div>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="col-12">
+                <p class="text-muted text-center py-3"><i class="bi bi-image"></i> No progress photos yet. Click "Progress" next to a member to add photos.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="progressForm" enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class="bi bi-camera text-warning me-1"></i> Add Progress Photos</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="memberName" id="progressMember">
+          <div class="mb-3">
+            <label class="form-label fw-medium small">Member</label>
+            <input type="text" class="form-control" id="progressMemberDisplay" disabled>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium small">Photos <small class="text-muted">(select multiple)</small></label>
+            <input type="file" name="progressPhotos" class="form-control" multiple accept=".jpg,.jpeg,.png" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium small">Notes</label>
+            <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Great improvement in core strength!"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div id="progressMsg"></div>
+          <button type="submit" class="btn btn-warning fw-bold"><i class="bi bi-upload me-1"></i> Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.add-progress').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var name = this.dataset.member;
+    document.getElementById('progressMember').value = name;
+    document.getElementById('progressMemberDisplay').value = name;
+    document.getElementById('progressMsg').innerHTML = '';
+    new bootstrap.Modal(document.getElementById('progressModal')).show();
+  });
+});
+
+document.getElementById('progressForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var formData = new FormData(this);
+  var msgEl = document.getElementById('progressMsg');
+  msgEl.innerHTML = '<div class="spinner-border spinner-border-sm text-warning me-1"></div> Uploading...';
+  fetch('/coach/add-progress', { method: 'POST', body: formData })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success) {
+        msgEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Progress added!</span>';
+        setTimeout(function() { location.reload(); }, 1000);
+      } else {
+        msgEl.innerHTML = '<span class="text-danger">' + (d.error || 'Failed') + '</span>';
+      }
+    })
+    .catch(function() {
+      msgEl.innerHTML = '<span class="text-danger">Upload failed</span>';
+    });
+});
+</script>
 
 <%- include('../partials/footer') %>
